@@ -10,16 +10,16 @@ export default function HomePage() {
             
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight mb-6">Fixed‑Fee Accounting for SMEs</h1>
             <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-2xl mx-auto">
-              While consultants schedule kickoff calls, we deliver finished proposals. World-class quality. UAE-licensed. Guaranteed.
+              Accurate compliance, proactive reminders, and clear financials — without surprises.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-              <Link href="/signup"><Button variant="accent" size="lg" className="w-full sm:w-auto">Get Your Proposal Now</Button></Link>
-              <Link href="/how-it-works"><Button variant="outline" size="lg" className="w-full sm:w-auto border-white text-white hover:bg-white hover:text-gray-900">See How It Works</Button></Link>
+              <Link href="/contact"><Button variant="accent" size="lg" className="w-full sm:w-auto">Get Accounting Support</Button></Link>
+              <Link href="/#capabilities"><Button variant="outline" size="lg" className="w-full sm:w-auto border-white text-white hover:bg-white hover:text-gray-900">See How It Works</Button></Link>
             </div>
             <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-gray-400">
-              <span>100+ UAE Businesses</span>
-              <span>68% Win Rate</span>
-              <span>4.9/5 Rating</span>
+              <span>99.8% On‑Time Filings</span>
+              <span>500+ Returns Filed</span>
+              <span>100+ SMEs Supported</span>
             </div>
           </div>
         </Container>
@@ -29,26 +29,26 @@ export default function HomePage() {
         <Container>
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Why Choose My Tax Accounting?</h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">We deliver results, not software access.</p>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">On‑time compliance, expert review, and transparent fixed fees.</p>
           </div>
           <div className="grid md:grid-cols-3 gap-8">
             <Card className="text-center p-8"><CardContent className="pt-6">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">⚡</div>
-              <h3 className="text-xl font-semibold mb-2">5-Hour Delivery</h3>
-              <p className="text-gray-600 mb-4">Traditional consultants take 2-4 weeks. We deliver same day.</p>
-              <Badge variant="success">50x Faster</Badge>
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">⏰</div>
+              <h3 className="text-xl font-semibold mb-2">On‑Time Compliance</h3>
+              <p className="text-gray-600 mb-4">GST, PAYE/ESCT, payroll and returns filed on schedule.</p>
+              <Badge variant="success">Deadline Tracking</Badge>
             </CardContent></Card>
             <Card className="text-center p-8"><CardContent className="pt-6">
               <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">✓</div>
-              <h3 className="text-xl font-semibold mb-2">World-Class Quality</h3>
-              <p className="text-gray-600 mb-4">Professional methodologies from elite consulting frameworks.</p>
-              <Badge variant="success">9-Point Validation</Badge>
+              <h3 className="text-xl font-semibold mb-2">Expert Review</h3>
+              <p className="text-gray-600 mb-4">AI‑assisted prep + accountant validation and documented checks.</p>
+              <Badge variant="success">Accuracy Guarantee</Badge>
             </CardContent></Card>
             <Card className="text-center p-8"><CardContent className="pt-6">
               <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">$</div>
-              <h3 className="text-xl font-semibold mb-2">$799 Per Proposal</h3>
-              <p className="text-gray-600 mb-4">vs $5,000-$15,000 from traditional consultants.</p>
-              <Badge variant="success">85% Savings</Badge>
+              <h3 className="text-xl font-semibold mb-2">Fixed Monthly Fees</h3>
+              <p className="text-gray-600 mb-4">Transparent packages for SMEs — no surprises.</p>
+              <Badge variant="success">Transparent Pricing</Badge>
             </CardContent></Card>
           </div>
         </Container>
@@ -75,18 +75,18 @@ export default function HomePage() {
             </div>
             <div className="text-center">
               <div className="w-12 h-12 bg-[#0066CC] text-white rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-4">2</div>
-              <h3 className="text-xl font-semibold mb-2">We Work Our Magic</h3>
-              <p className="text-gray-600 mb-2">AI + expert review creates your proposal.</p>
-              <Badge variant="secondary">5 hours</Badge>
+              <h3 className="text-xl font-semibold mb-2">We Set Up GST/PAYE</h3>
+              <p className="text-gray-600 mb-2">Connect Xero/MYOB, set up GST/PAYE and reminders.</p>
+              <Badge variant="secondary">1–3 days</Badge>
             </div>
             <div className="text-center">
               <div className="w-12 h-12 bg-[#0066CC] text-white rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-4">3</div>
-              <h3 className="text-xl font-semibold mb-2">Receive and Win</h3>
-              <p className="text-gray-600 mb-2">Get your professional proposal ready to submit.</p>
-              <Badge variant="secondary">Review and submit</Badge>
+              <h3 className="text-xl font-semibold mb-2">Operate Clean Monthly</h3>
+              <p className="text-gray-600 mb-2">We file GST/payroll, send reports, and handle IRD.</p>
+              <Badge variant="secondary">Ongoing</Badge>
             </div>
           </div>
-          <div className="text-center"><Link href="/how-it-works"><Button variant="outline">Learn More</Button></Link></div>
+          <div className="text-center"><Link href="/#capabilities"><Button variant="outline">Learn More</Button></Link></div>
         </Container>
       </Section>
 
