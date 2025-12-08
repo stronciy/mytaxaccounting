@@ -48,10 +48,33 @@ export default function ContactPage() {
               <div>
                 <h3 className='text-xl font-semibold mb-4'>Contact Information</h3>
                 <div className='space-y-3 text-gray-600'>
+                  <p>Phone: +64 27 242 3432</p>
                   <p>Email: info@mytaxaccountant.co.nz</p>
-                  <p>Phone: 0800 742 915</p>
+                  <p>Website: <a href='https://www.mytaxaccountant.co.nz' className='text-[#0066CC] hover:underline' target='_blank' rel='noopener noreferrer'>www.mytaxaccountant.co.nz</a></p>
                   <p>Response Time: Within 4 hours</p>
-                  <p>Location: Level 10, 21 Queen Street, Auckland 1010, New Zealand</p>
+                  <p>Address:</p>
+                  <p className='pl-4'>8 Montserrat Place,</p>
+                  <p className='pl-4'>Grenada Village,</p>
+                  <p className='pl-4'>Wellington 6037,</p>
+                  <p className='pl-4'>New Zealand</p>
+                </div>
+              </div>
+
+              <div>
+                <h3 className='text-xl font-semibold mb-4'>Company Details</h3>
+                <div className='space-y-2 text-gray-600'>
+                  <p>Company number: 7654816</p>
+                  <p>NZBN: 9429047612747</p>
+                  <p>Incorporation Date: 08 Aug 2019</p>
+                  <p>Company Status: Registered</p>
+                  <p>Entity type: NZ Limited Company</p>
+                </div>
+              </div>
+
+              <div>
+                <h3 className='text-xl font-semibold mb-4'>Industry Classification(s)</h3>
+                <div className='text-gray-600'>
+                  <p>M693250 Tax agent</p>
                 </div>
               </div>
               
