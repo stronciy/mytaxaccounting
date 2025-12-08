@@ -77,7 +77,18 @@ export function MobileNav({ isOpen, onClose }: MobileNavProps) {
                   <Link
                     href={item.href}
                     className="group flex items-center gap-4 py-4 border-b border-slate-800 text-lg font-medium text-white hover:text-[#d4a853] transition-colors"
-                    onClick={onClose}
+                    onClick={(e) => {
+                      const isAnchor = item.href.startsWith("/#")
+                      if (isAnchor && window.location.pathname === "/") {
+                        e.preventDefault()
+                        const id = item.href.split("#")[1]
+                        const el = document.getElementById(id)
+                        el?.scrollIntoView({ behavior: "smooth", block: "start" })
+                        onClose()
+                      } else {
+                        onClose()
+                      }
+                    }}
                   >
                     <span className="text-mono text-[#d4a853] text-xs">
                       0{index + 1}
@@ -90,20 +101,13 @@ export function MobileNav({ isOpen, onClose }: MobileNavProps) {
           </nav>
 
           {/* CTA */}
-          <div className="border-t border-slate-800 px-6 py-8 space-y-4">
+          <div className="border-t border-slate-800 px-6 py-8">
             <Link
-              href="/login"
-              className="block w-full py-3 text-center text-white border border-slate-600 hover:border-[#d4a853] transition-colors"
-              onClick={onClose}
-            >
-              Log In
-            </Link>
-            <Link
-              href="/signup"
+              href="tel:0800742915"
               className="block w-full py-3 text-center bg-[#d4a853] hover:bg-[#e4be6a] text-[#0a0f1a] font-semibold transition-colors"
               onClick={onClose}
             >
-              Get Started
+              0800 742 915
             </Link>
           </div>
         </div>

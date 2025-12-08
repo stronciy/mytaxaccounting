@@ -3,7 +3,7 @@ import { Section, Container } from '@/components/ui'
 
 export const metadata: Metadata = {
   title: 'Privacy Policy',
-  description: 'V39 Consultancy Privacy Policy - How we collect, use, and protect your personal information.',
+  description: 'My Tax Accounting Privacy Policy — how we collect, use, and protect your data.',
 }
 
 export default function PrivacyPage() {
@@ -25,9 +25,9 @@ export default function PrivacyPage() {
           <div className="max-w-4xl mx-auto prose prose-lg">
             <h2>1. Introduction</h2>
             <p>
-              V39 Consultancy (&quot;we,&quot; &quot;our,&quot; or &quot;us&quot;) is committed to protecting your privacy.
+              My Tax Accounting (&quot;we,&quot; &quot;our,&quot; or &quot;us&quot;) is committed to protecting your privacy.
               This Privacy Policy explains how we collect, use, disclose, and safeguard your
-              information when you use our RFP proposal generation services.
+              information when you use our accounting services.
             </p>
 
             <h2>2. Information We Collect</h2>
@@ -40,11 +40,11 @@ export default function PrivacyPage() {
               <li>Account credentials</li>
             </ul>
 
-            <h3>2.2 RFP Documents and Business Data</h3>
+            <h3>2.2 Financial Documents and Business Data</h3>
             <p>
-              When you use our services, you may upload RFP documents, company materials,
+              When you use our services, you may upload financial documents (invoices, statements), payroll data,
               and other business-related content. This information is processed solely to
-              generate your proposals and is treated with the highest confidentiality.
+              deliver accounting services and is treated with the highest confidentiality.
             </p>
 
             <h3>2.3 Automatically Collected Information</h3>
@@ -82,9 +82,8 @@ export default function PrivacyPage() {
             <h2>5. Data Retention</h2>
             <p>
               We retain your personal information for as long as necessary to provide our
-              services and fulfill the purposes outlined in this policy. RFP documents and
-              generated proposals are automatically deleted 30 days after delivery unless
-              you opt-in to extended storage.
+              services and fulfill the purposes outlined in this policy. Financial documents and
+              filing proofs can be deleted after 90 days upon request, subject to legal retention requirements.
             </p>
 
             <h2>6. Information Sharing</h2>
@@ -133,8 +132,8 @@ export default function PrivacyPage() {
               please contact us at:
             </p>
             <p>
-              <strong>Email:</strong> privacy@v39-consultancy.com<br />
-              <strong>Address:</strong> V39 Consultancy, Dubai, UAE
+              <strong>Email:</strong> privacy@mytaxaccountant.co.nz<br />
+              <strong>Address:</strong> My Tax Accounting, Level 10, 21 Queen Street, Auckland 1010, New Zealand
             </p>
           </div>
         </Container>

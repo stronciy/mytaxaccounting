@@ -4,15 +4,15 @@ import { Button, Card, Section, Container, Badge } from '@/components/ui'
 
 export const metadata: Metadata = {
   title: 'Case Studies',
-  description: 'See how global businesses win more RFPs with V39. Real results from real clients.',
+  description: 'Real results from SMEs using our accounting services: on-time filings, savings, accuracy.',
 }
 
 export default function CaseStudiesPage() {
   const cases = [
-    { industry: 'IT Consulting', company: 'Technology Consultancy', result: '$1.2M contract won', metric: '24 hours delivery' },
-    { industry: 'Engineering', company: 'Engineering Firm', result: '4 out of 5 wins', metric: '82% win rate' },
-    { industry: 'Healthcare', company: 'Healthcare Services Provider', result: 'First proposal win', metric: '$450K contract' },
-    { industry: 'Professional Services', company: 'Business Advisory Firm', result: '40% time savings', metric: '12 proposals/year' },
+    { industry: 'Retail', company: 'Owner‑operated retail SME', result: 'Avoided IRD penalties', metric: 'GST & payroll caught up in 72h' },
+    { industry: 'Software', company: 'Startup (Core tier)', result: 'Saved ~65% accounting costs', metric: 'GST + Xero reporting' },
+    { industry: 'Manufacturing', company: 'SME (Performance)', result: 'Zero PAYE/ESCT errors', metric: 'Multi‑point accuracy checks' },
+    { industry: 'Property', company: 'Investor (Growth)', result: 'Clean year‑end close', metric: 'Rental schedules + annual accounts' },
   ]
 
   return (
@@ -21,7 +21,7 @@ export default function CaseStudiesPage() {
         <Container>
           <div className='max-w-3xl mx-auto text-center'>
             <h1 className='text-4xl md:text-5xl font-bold text-gray-900 mb-6'>Real Results from Real Clients</h1>
-            <p className='text-xl text-gray-600'>See how global businesses are winning more contracts with V39.</p>
+            <p className='text-xl text-gray-600'>See how SMEs operate clean with My Tax Accounting.</p>
           </div>
         </Container>
       </Section>
@@ -29,10 +29,10 @@ export default function CaseStudiesPage() {
       <Section background='white' className='py-8'>
         <Container>
           <div className='grid grid-cols-2 md:grid-cols-4 gap-8 text-center'>
-            <div><div className='text-3xl font-bold text-[#0066CC]'>100+</div><div className='text-gray-600'>Proposals</div></div>
-            <div><div className='text-3xl font-bold text-[#0066CC]'>82%</div><div className='text-gray-600'>Win Rate</div></div>
-            <div><div className='text-3xl font-bold text-[#0066CC]'>$15M+</div><div className='text-gray-600'>Contracts Won</div></div>
-            <div><div className='text-3xl font-bold text-[#0066CC]'>4.9/5</div><div className='text-gray-600'>Rating</div></div>
+            <div><div className='text-3xl font-bold text-[#0066CC]'>99.8%</div><div className='text-gray-600'>On‑time filings</div></div>
+            <div><div className='text-3xl font-bold text-[#0066CC]'>500+</div><div className='text-gray-600'>Returns filed</div></div>
+            <div><div className='text-3xl font-bold text-[#0066CC]'>65%</div><div className='text-gray-600'>Avg. savings</div></div>
+            <div><div className='text-3xl font-bold text-[#0066CC]'>4.9/5</div><div className='text-gray-600'>Client rating</div></div>
           </div>
         </Container>
       </Section>
@@ -56,8 +56,8 @@ export default function CaseStudiesPage() {
         <Container>
           <div className='text-center max-w-3xl mx-auto'>
             <h2 className='text-3xl font-bold text-white mb-4'>Become Our Next Success Story</h2>
-            <p className='text-xl text-gray-300 mb-8'>Join the growing list of global businesses winning with V39.</p>
-            <Link href='/signup'><Button variant='accent' size='lg'>Get Your Proposal Now</Button></Link>
+            <p className='text-xl text-gray-300 mb-8'>Join SMEs operating clean with fixed fee accounting.</p>
+            <Link href='/contact'><Button variant='accent' size='lg'>Get Accounting Support</Button></Link>
           </div>
         </Container>
       </Section>

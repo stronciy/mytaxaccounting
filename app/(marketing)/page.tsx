@@ -1,4 +1,4 @@
-﻿import Link from 'next/link'
+import Link from 'next/link'
 import { Button, Card, CardContent, Section, Container, Badge } from '@/components/ui'
 
 export default function HomePage() {
@@ -7,10 +7,8 @@ export default function HomePage() {
       <section className="relative min-h-[90vh] flex items-center bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white overflow-hidden">
         <Container size="xl" className="relative z-10 py-20">
           <div className="max-w-4xl mx-auto text-center">
-            <Badge variant="secondary" className="mb-6 bg-white/10 text-white border-white/20">RaaS - Result as a Service</Badge>
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight mb-6">
-              RFP Proposals in <span className="text-[#FF9900]">5 Hours</span> for <span className="text-[#FF9900]">$799</span>
-            </h1>
+            
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight mb-6">Fixed‑Fee Accounting for SMEs</h1>
             <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-2xl mx-auto">
               While consultants schedule kickoff calls, we deliver finished proposals. World-class quality. UAE-licensed. Guaranteed.
             </p>
@@ -30,7 +28,7 @@ export default function HomePage() {
       <Section background="white">
         <Container>
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Why Choose V39?</h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Why Choose My Tax Accounting?</h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">We deliver results, not software access.</p>
           </div>
           <div className="grid md:grid-cols-3 gap-8">
@@ -58,12 +56,10 @@ export default function HomePage() {
 
       <Section background="gray" className="py-12">
         <Container>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-            <div><div className="text-4xl font-bold text-[#0066CC] mb-2">100+</div><div className="text-gray-600">Proposals Delivered</div></div>
-            <div><div className="text-4xl font-bold text-[#0066CC] mb-2">68%</div><div className="text-gray-600">Client Win Rate</div></div>
-            <div><div className="text-4xl font-bold text-[#0066CC] mb-2">$2.8M+</div><div className="text-gray-600">Contracts Won</div></div>
-            <div><div className="text-4xl font-bold text-[#0066CC] mb-2">4.8hr</div><div className="text-gray-600">Avg Delivery</div></div>
-          </div>
+            <div className="text-center max-w-3xl mx-auto">
+              <h3 className="text-3xl font-bold text-[#0066CC] mb-3">Choose Clarity. Choose Compliance.</h3>
+              <p className="text-lg text-gray-600">Fixed‑fee accounting for SMEs — on‑time GST, payroll, and annual returns.</p>
+            </div>
         </Container>
       </Section>
 
@@ -73,8 +69,8 @@ export default function HomePage() {
           <div className="grid md:grid-cols-3 gap-8 mb-12">
             <div className="text-center">
               <div className="w-12 h-12 bg-[#0066CC] text-white rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-4">1</div>
-              <h3 className="text-xl font-semibold mb-2">Upload Your RFP</h3>
-              <p className="text-gray-600 mb-2">Share your RFP document and company materials.</p>
+              <h3 className="text-xl font-semibold mb-2">Share Your Details</h3>
+              <p className="text-gray-600 mb-2">Business info + access to Xero/MYOB.</p>
               <Badge variant="secondary">5 minutes</Badge>
             </div>
             <div className="text-center">
@@ -97,11 +93,11 @@ export default function HomePage() {
       <Section background="dark">
         <Container>
           <div className="text-center max-w-3xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Ready to Win More RFPs?</h2>
-            <p className="text-xl text-gray-300 mb-8">Join 100+ UAE businesses winning contracts with V39.</p>
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Ready to Operate Clean?</h2>
+            <p className="text-xl text-gray-300 mb-8">On‑time GST, payroll, and annual returns with fixed monthly fees.</p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/signup"><Button variant="accent" size="lg">Get Your Proposal Now</Button></Link>
-              <Link href="/pricing"><Button variant="outline" size="lg" className="border-white text-white hover:bg-white hover:text-gray-900">View Pricing</Button></Link>
+              <Link href="/contact"><Button variant="accent" size="lg">Get Accounting Support</Button></Link>
+              <Link href="/#packages"><Button variant="outline" size="lg" className="border-white text-white hover:bg-white hover:text-gray-900">See Packages</Button></Link>
             </div>
           </div>
         </Container>

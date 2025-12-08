@@ -9,27 +9,25 @@ export interface FooterNavSection {
 }
 
 export const mainNav: NavItem[] = [
-  { label: "How It Works", href: "/how-it-works" },
-  { label: "Pricing", href: "/pricing" },
-  { label: "Case Studies", href: "/case-studies" },
-  { label: "Security", href: "/security" },
-  { label: "About", href: "/about" },
+  { label: "Services", href: "/#services" },
+  { label: "Fixed Fee Packages", href: "/#packages" },
+  { label: "Add-ons", href: "/#advisory" },
+  { label: "FAQ", href: "/#faq" },
+  { label: "Contact", href: "/contact" },
 ]
 
 export const footerNav: Record<string, FooterNavSection> = {
   product: {
     title: "Product",
     links: [
-      { label: "How It Works", href: "/how-it-works" },
-      { label: "Pricing", href: "/pricing" },
-      { label: "Case Studies", href: "/case-studies" },
+      { label: "Services", href: "/#services" },
+      { label: "Fixed Fee Packages", href: "/#packages" },
+      { label: "Add-ons", href: "/#advisory" },
     ],
   },
   company: {
     title: "Company",
     links: [
-      { label: "About Us", href: "/about" },
-      { label: "Security", href: "/security" },
       { label: "Contact", href: "/contact" },
     ],
   },

@@ -1,17 +1,17 @@
-﻿import { Metadata } from 'next'
+import { Metadata } from 'next'
 import Link from 'next/link'
 import { Button } from '@/components/ui'
 
 export const metadata: Metadata = {
-  title: 'Sign Up',
-  description: 'Create your V39 account and start winning more RFPs today.',
+  title: 'Create Account',
+  description: 'Create your My Tax Accounting account and access fixed-fee services.',
 }
 
 export default function SignupPage() {
   return (
     <div>
       <h1 className='text-2xl font-bold text-center mb-2'>Create your account</h1>
-      <p className='text-gray-600 text-center mb-8'>Start winning more RFPs today</p>
+      <p className='text-gray-600 text-center mb-8'>Access fixed‑fee accounting services</p>
       
       <form className='space-y-4'>
         <div>

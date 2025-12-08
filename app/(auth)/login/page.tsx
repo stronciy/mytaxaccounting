@@ -1,17 +1,17 @@
-﻿import { Metadata } from 'next'
+import { Metadata } from 'next'
 import Link from 'next/link'
 import { Button } from '@/components/ui'
 
 export const metadata: Metadata = {
   title: 'Log In',
-  description: 'Log in to your V39 account to manage proposals and subscriptions.',
+  description: 'Log in to your My Tax Accounting account to manage services and subscriptions.',
 }
 
 export default function LoginPage() {
   return (
     <div>
       <h1 className='text-2xl font-bold text-center mb-2'>Welcome back</h1>
-      <p className='text-gray-600 text-center mb-8'>Log in to your V39 account</p>
+      <p className='text-gray-600 text-center mb-8'>Log in to your My Tax Accounting account</p>
       
       <form className='space-y-4'>
         <div>

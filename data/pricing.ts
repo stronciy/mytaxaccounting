@@ -24,7 +24,7 @@ export const subscriptionTiers: PricingTier[] = [
   {
     id: "starter",
     name: "Starter",
-    description: "Perfect for occasional RFP responses",
+    description: "Perfect for compliance‑only needs",
     monthlyPrice: 599,
     annualPrice: 499,
     proposals: 1,
@@ -42,7 +42,7 @@ export const subscriptionTiers: PricingTier[] = [
   {
     id: "professional",
     name: "Professional",
-    description: "For growing businesses with regular RFPs",
+    description: "For GST‑registered small businesses",
     monthlyPrice: 1299,
     annualPrice: 1099,
     proposals: 3,
@@ -139,15 +139,15 @@ export const faqItems = [
   },
   {
     question: "What's included in the Premium Intelligence add-on?",
-    answer: "Premium Intelligence ($499) runs your RFP through all three AI engines (Claude, GPT-4, Gemini), then combines the best elements from each for a superior result. It includes unlimited regenerations for that proposal.",
+    answer: "Advisory bundle adds budgeting, cash‑flow forecasting, quarterly reports and accountability meetings, and tax planning before year‑end.",
   },
   {
     question: "Is there a money-back guarantee?",
-    answer: "Yes! If we miss any requirement from your RFP, you get a full refund. We've never had to pay out because our 9-point validation ensures 100% requirement coverage.",
+    answer: "Yes! If we miss a filing deadline due to our error, we cover fees and re‑file immediately. Accuracy checks help prevent mistakes.",
   },
   {
     question: "Can I try before I subscribe?",
-    answer: "We offer a free consultation where we review your RFP and provide a detailed scope assessment. For your first proposal, we recommend the pay-as-you-go single proposal option to experience our quality firsthand.",
+    answer: "We offer a free consultation where we review your accounting scope and provide a plan. For first‑time clients, we recommend the Starter or Core package.",
   },
   {
     question: "How does billing work for annual plans?",

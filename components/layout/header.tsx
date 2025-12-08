@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import Link from "next/link"
+import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { Logo } from "./logo"
 import { MobileNav } from "./mobile-nav"
@@ -14,6 +15,8 @@ interface HeaderProps {
 export function Header({ transparent = false }: HeaderProps) {
   const [isScrolled, setIsScrolled] = React.useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false)
+  const [activeSection, setActiveSection] = React.useState<string>("")
+  const pathname = usePathname()
 
   React.useEffect(() => {
     const handleScroll = () => {
@@ -21,6 +24,34 @@ export function Header({ transparent = false }: HeaderProps) {
     }
     window.addEventListener("scroll", handleScroll)
     return () => window.removeEventListener("scroll", handleScroll)
+  }, [])
+
+  React.useEffect(() => {
+    const ids = [
+      "services",
+      "packages",
+      "advisory",
+      "faq",
+      "selection",
+      "capabilities",
+      "case-studies",
+      "deliverables",
+      "cta",
+    ]
+    const elements = ids
+      .map((id) => document.getElementById(id))
+      .filter(Boolean) as HTMLElement[]
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)
+        if (visible[0]) setActiveSection(visible[0].target.id)
+      },
+      { rootMargin: "-20% 0px -60% 0px", threshold: [0.1, 0.25, 0.5] }
+    )
+    elements.forEach((el) => observer.observe(el))
+    return () => observer.disconnect()
   }, [])
 
   const showBackground = isScrolled || !transparent
@@ -42,35 +73,41 @@ export function Header({ transparent = false }: HeaderProps) {
 
             {/* Desktop Navigation */}
             <nav className="hidden lg:flex lg:items-center lg:gap-8">
-              {mainNav.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={cn(
-                    "relative text-sm font-medium transition-colors",
-                    "text-slate-300 hover:text-white",
-                    "after:absolute after:bottom-0 after:left-0 after:h-px after:w-0 after:bg-[#d4a853] after:transition-all after:duration-300",
-                    "hover:after:w-full"
-                  )}
-                >
-                  {item.label}
-                </Link>
-              ))}
+              {mainNav.map((item) => {
+                const isAnchor = item.href.startsWith("/#")
+                const id = isAnchor ? item.href.split("#")[1] : ""
+                const isActive = isAnchor && activeSection === id
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={(e) => {
+                      if (isAnchor && pathname === "/") {
+                        e.preventDefault()
+                        const el = document.getElementById(id)
+                        el?.scrollIntoView({ behavior: "smooth", block: "start" })
+                      }
+                    }}
+                    className={cn(
+                      "relative text-sm font-medium transition-colors",
+                      isActive ? "text-white" : "text-slate-300 hover:text-white",
+                      "after:absolute after:bottom-0 after:left-0 after:h-px after:w-0 after:bg-[#d4a853] after:transition-all after:duration-300",
+                      isActive ? "after:w-full" : "hover:after:w-full"
+                    )}
+                  >
+                    {item.label}
+                  </Link>
+                )
+              })}
             </nav>
 
             {/* Desktop CTA */}
             <div className="hidden lg:flex lg:items-center lg:gap-4">
               <Link
-                href="/login"
-                className="text-sm font-medium text-slate-300 hover:text-white transition-colors"
-              >
-                Log In
-              </Link>
-              <Link
-                href="/signup"
+                href="tel:0800742915"
                 className="btn-glow inline-flex items-center justify-center bg-[#d4a853] hover:bg-[#e4be6a] text-[#0a0f1a] px-5 py-2.5 text-sm font-semibold transition-all duration-300"
               >
-                Get Started
+                0800 742 915
               </Link>
             </div>
 

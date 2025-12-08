@@ -3,7 +3,7 @@ import { Section, Container } from '@/components/ui'
 
 export const metadata: Metadata = {
   title: 'Terms of Service',
-  description: 'V39 Consultancy Terms of Service - Terms and conditions for using our RFP proposal generation services.',
+  description: 'My Tax Accounting Terms of Service — conditions for accounting services.',
 }
 
 export default function TermsPage() {
@@ -25,16 +25,15 @@ export default function TermsPage() {
           <div className="max-w-4xl mx-auto prose prose-lg">
             <h2>1. Acceptance of Terms</h2>
             <p>
-              By accessing or using V39 Consultancy&apos;s services (&quot;Services&quot;), you agree to be
+              By accessing or using My Tax Accounting&apos;s services (&quot;Services&quot;), you agree to be
               bound by these Terms of Service (&quot;Terms&quot;). If you do not agree to these Terms,
               please do not use our Services.
             </p>
 
             <h2>2. Description of Services</h2>
             <p>
-              V39 Consultancy provides AI-powered RFP (Request for Proposal) proposal
-              generation services. We deliver professionally written proposals based on
-              the information and documents you provide.
+              My Tax Accounting provides accounting services (GST, payroll, annual accounts, tax returns).
+              We deliver compliant filings, clear reports, and advisory where requested.
             </p>
 
             <h2>3. Account Registration</h2>
@@ -84,15 +83,15 @@ export default function TermsPage() {
             <h2>6. Intellectual Property</h2>
             <h3>6.1 Your Content</h3>
             <p>
-              You retain all rights to the RFP documents, company materials, and other
+              You retain all rights to the documents, financial records, payroll data, and other
               content you provide to us (&quot;Your Content&quot;). You grant us a limited license
               to use Your Content solely for providing the Services.
             </p>
 
-            <h3>6.2 Generated Proposals</h3>
+            <h3>6.2 Generated Outputs</h3>
             <p>
-              Upon full payment, you receive all rights to the proposals we generate for
-              you. You may use, modify, and submit these proposals without restriction.
+              Upon full payment, you receive all rights to reports, filings (where applicable), and materials we produce for
+              you. You may use and store these outputs as needed.
             </p>
 
             <h3>6.3 Our Platform</h3>
@@ -126,7 +125,7 @@ export default function TermsPage() {
             </p>
             <ul>
               <li>
-                We do not guarantee that you will win any RFP or contract
+                We do not guarantee specific tax outcomes or regulatory decisions
               </li>
               <li>
                 We are not liable for any indirect, incidental, or consequential damages
@@ -157,13 +156,12 @@ export default function TermsPage() {
             <h2>12. Dispute Resolution</h2>
             <p>
               Any disputes arising from these Terms or our Services shall be resolved
-              through binding arbitration in Dubai, UAE, in accordance with the rules
-              of the Dubai International Arbitration Centre.
+              through binding arbitration in New Zealand, in accordance with applicable rules.
             </p>
 
             <h2>13. Governing Law</h2>
             <p>
-              These Terms are governed by the laws of the United Arab Emirates, without
+              These Terms are governed by the laws of New Zealand, without
               regard to conflict of law principles.
             </p>
 
@@ -179,8 +177,8 @@ export default function TermsPage() {
               For questions about these Terms, please contact us at:
             </p>
             <p>
-              <strong>Email:</strong> legal@v39-consultancy.com<br />
-              <strong>Address:</strong> V39 Consultancy, Dubai, UAE
+              <strong>Email:</strong> legal@mytaxaccountant.co.nz<br />
+              <strong>Address:</strong> My Tax Accounting, Level 10, 21 Queen Street, Auckland 1010, New Zealand
             </p>
           </div>
         </Container>

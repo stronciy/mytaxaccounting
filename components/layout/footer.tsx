@@ -14,13 +14,13 @@ export function Footer() {
           <div className="lg:col-span-2">
             <Logo variant="light" />
             <p className="mt-6 text-sm leading-relaxed max-w-sm">
-              AI-powered RFP proposal generation delivering professional proposals
-              in 24 hours. Result as a Service—your success is our only metric.
+              Fixed-fee accounting for SMEs: annual accounts, GST, payroll, and tax returns.
+              Accurate compliance and clear reporting—so you can focus on growth.
             </p>
             {/* Social Links */}
             <div className="mt-8 flex gap-4">
               <a
-                href="https://linkedin.com/company/v39-consultancy"
+                href="#"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-10 h-10 flex items-center justify-center border border-slate-700 hover:border-[#d4a853] hover:text-[#d4a853] transition-all duration-300"
@@ -31,7 +31,7 @@ export function Footer() {
                 </svg>
               </a>
               <a
-                href="https://twitter.com/v39consultancy"
+                href="#"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-10 h-10 flex items-center justify-center border border-slate-700 hover:border-[#d4a853] hover:text-[#d4a853] transition-all duration-300"
@@ -70,7 +70,7 @@ export function Footer() {
         <div className="border-t border-slate-800 py-6">
           <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
             <p className="text-xs text-slate-600">
-              &copy; {currentYear} V39 Consultancy. All rights reserved.
+              &copy; {currentYear} My Tax Accounting. All rights reserved.
             </p>
             <div className="flex items-center gap-6 text-xs text-slate-600">
               <span className="flex items-center gap-2">

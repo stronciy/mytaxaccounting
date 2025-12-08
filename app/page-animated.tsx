@@ -262,7 +262,7 @@ export default function HomePageAnimated() {
             {/* Main Headline with staggered clip reveal */}
             <h1 className={`display-hero text-white mb-8 opacity-0 ${isLoaded ? 'animate-fade-in-up delay-100' : ''}`}>
               <ClipReveal delay={300}>
-                <span className="block">Stop Losing RFPs to</span>
+                <span className="block">Stop Missing IRD Deadlines</span>
               </ClipReveal>
               <ClipReveal delay={600}>
                 <span className="block">Firms With Better Proposals</span>
