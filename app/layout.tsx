@@ -15,6 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_WP_BASE_URL || 'https://mytaxaccountant.co.nz'),
   title: {
     default: 'My Tax Accounting | GST, Payroll, Annual Returns',
     template: '%s | My Tax Accounting',
