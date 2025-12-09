@@ -99,6 +99,8 @@ export async function POST(req: NextRequest) {
   const outerAuth = req.headers.get('x-blaze-auth') || outerBearer
 
   const responses: any[] = []
+  let nextTagId = 1001
+  let nextCategoryId = 2001
 
   for (const item of items) {
     const method = (item.method || 'GET').toUpperCase()
@@ -210,6 +212,70 @@ export async function POST(req: NextRequest) {
         logError('batch.posts.error', { requestId, error: String(error) })
         responses.push({ status: 500, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: 'rest_cannot_create', message: 'Error creating post' }) })
       }
+      continue
+    }
+
+    if (normalized.startsWith('/wp/v2/tags') && method === 'POST') {
+      logInfo('batch.tags.body_raw', { requestId, body: item.body })
+      if (!token) {
+        logError('batch.tags.no_token', { requestId })
+        responses.push({ status: 403, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: 'rest_cannot_access', message: 'Forbidden' }) })
+        continue
+      }
+      try {
+        jwt.verify(token, SECRET, { algorithms: ['HS256'], issuer: publicOrigin, clockTolerance: 240 })
+      } catch (e: any) {
+        logError('batch.tags.verify_failed', { requestId })
+        responses.push({ status: 401, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: 'rest_token_invalid', message: 'Invalid token' }) })
+        continue
+      }
+      const body = item.body || {}
+      const name = pickText(body.name) || pickText(body.title) || ''
+      const slug = body.slug || String(name || '').toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
+      const description = pickText(body.description)
+      const id = nextTagId++
+      const term = {
+        id,
+        name,
+        slug,
+        taxonomy: 'post_tag',
+        description: description || '',
+        link: `${req.nextUrl.origin}/blog/tag/${slug}`,
+      }
+      logInfo('batch.tags.created', { requestId, id, slug })
+      responses.push({ status: 201, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(term) })
+      continue
+    }
+
+    if (normalized.startsWith('/wp/v2/categories') && method === 'POST') {
+      logInfo('batch.categories.body_raw', { requestId, body: item.body })
+      if (!token) {
+        logError('batch.categories.no_token', { requestId })
+        responses.push({ status: 403, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: 'rest_cannot_access', message: 'Forbidden' }) })
+        continue
+      }
+      try {
+        jwt.verify(token, SECRET, { algorithms: ['HS256'], issuer: publicOrigin, clockTolerance: 240 })
+      } catch (e: any) {
+        logError('batch.categories.verify_failed', { requestId })
+        responses.push({ status: 401, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: 'rest_token_invalid', message: 'Invalid token' }) })
+        continue
+      }
+      const body = item.body || {}
+      const name = pickText(body.name) || pickText(body.title) || ''
+      const slug = body.slug || String(name || '').toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
+      const description = pickText(body.description)
+      const id = nextCategoryId++
+      const term = {
+        id,
+        name,
+        slug,
+        taxonomy: 'category',
+        description: description || '',
+        link: `${req.nextUrl.origin}/blog/category/${slug}`,
+      }
+      logInfo('batch.categories.created', { requestId, id, slug })
+      responses.push({ status: 201, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(term) })
       continue
     }
 
