@@ -35,6 +35,11 @@ export async function POST(req: NextRequest) {
     username = body?.username
     password = body?.password
   }
+  if (!username || !password) {
+    const url = new URL(req.url)
+    username = username || url.searchParams.get('username') || undefined
+    password = password || url.searchParams.get('password') || undefined
+  }
 
   if (username !== USERNAME) {
     logError('blaze.token.invalid_username', { requestId, username })
