@@ -10,17 +10,28 @@ export async function GET(req: NextRequest) {
   const origin = getOrigin(req)
   const body = {
     name: 'My Tax Accounting',
-    description: 'WordPress REST compatibility',
+    description: 'Your Site',
     url: origin,
     home: origin,
-    namespaces: ['wp/v2', 'oembed/1.0'],
+    namespaces: ['blaze/v1'],
     routes: {
-      '/wp/v2': { namespace: 'wp/v2' },
-      '/wp/v2/posts': { namespace: 'wp/v2', methods: ['GET', 'POST'] },
-      '/blaze/v1': { namespace: 'blaze/v1' },
-      '/blaze/v1/token': { namespace: 'blaze/v1', methods: ['POST'] },
-      '/blaze/v1/can_publish': { namespace: 'blaze/v1', methods: ['GET'] },
+      '/blaze/v1': {
+        namespace: 'blaze/v1',
+        methods: ['GET'],
+        endpoints: [{ methods: ['GET'] }],
+      },
+      '/blaze/v1/token': {
+        namespace: 'blaze/v1',
+        methods: ['POST'],
+        endpoints: [{ methods: ['POST'] }],
+      },
+      '/blaze/v1/can_publish': {
+        namespace: 'blaze/v1',
+        methods: ['GET'],
+        endpoints: [{ methods: ['GET'] }],
+      },
     },
+    authentication: {},
   }
   return NextResponse.json(body, {
     headers: {
