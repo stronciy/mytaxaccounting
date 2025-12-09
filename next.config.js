@@ -4,6 +4,7 @@ const nextConfig = {
     return [
       { source: '/wp-json/wp/v2/posts', destination: '/api/wp/v2/posts' },
       { source: '/wp-json/blaze/v1/:path*', destination: '/api/blaze/v1/:path*' },
+      { source: '/wp-json/batch/v1', destination: '/api/batch/v1' },
       { source: '/blaze/v1/:path*', destination: '/api/blaze/v1/:path*' },
       { source: '/wp-json', destination: '/api/wp-json' },
       { source: '/wp-json/', destination: '/api/wp-json' },

@@ -18,14 +18,6 @@ export async function GET(req: NextRequest) {
 
   const userAgent = req.headers.get('user-agent')
   const ua = (userAgent || '').toLowerCase()
-  if (!ua.startsWith('blaze')) {
-    logError('blaze.can_publish.forbidden', { requestId, reason: 'Invalid UA' })
-    return NextResponse.json({ error: 'rest_cannot_access', message: 'Forbidden' }, { status: 403, headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET,POST,OPTIONS,HEAD',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-blaze-auth',
-    } })
-  }
 
   const authHeader = req.headers.get('x-blaze-auth')
   if (!authHeader) {
