@@ -20,7 +20,10 @@ export async function GET(req: NextRequest) {
 
   try {
     const decoded = jwt.verify(authHeader, SECRET) as any
-    if (decoded.iss !== req.nextUrl.origin || !decoded.data?.user_id) {
+    const forwardedHost = req.headers.get('x-forwarded-host')
+    const forwardedProto = req.headers.get('x-forwarded-proto') || 'https'
+    const publicOrigin = process.env.NEXT_PUBLIC_SITE_URL || (forwardedHost ? `${forwardedProto}://${forwardedHost}` : req.nextUrl.origin)
+    if (decoded.iss !== publicOrigin || !decoded.data?.user_id) {
       logError('blaze.can_publish.invalid_token', { requestId })
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
     }

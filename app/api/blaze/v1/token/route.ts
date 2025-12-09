@@ -22,8 +22,11 @@ export async function POST(req: NextRequest) {
   }
 
   const now = Math.floor(Date.now() / 1000)
+  const forwardedHost = req.headers.get('x-forwarded-host')
+  const forwardedProto = req.headers.get('x-forwarded-proto') || 'https'
+  const publicOrigin = process.env.NEXT_PUBLIC_SITE_URL || (forwardedHost ? `${forwardedProto}://${forwardedHost}` : req.nextUrl.origin)
   const payload = {
-    iss: req.nextUrl.origin,
+    iss: publicOrigin,
     iat: now,
     nbf: now,
     exp: now + 300,
@@ -33,4 +36,10 @@ export async function POST(req: NextRequest) {
   const token = jwt.sign(payload, SECRET, { algorithm: 'HS256' })
   logInfo('blaze.token.issued', { requestId, userId: 1 })
   return NextResponse.json({ token })
+}
+
+export async function GET(req: NextRequest) {
+  const requestId = makeRequestId()
+  logInfo('blaze.token.route_check', { requestId, req: sanitizeRequest(req) })
+  return NextResponse.json({ ok: true, method: 'POST' })
 }
