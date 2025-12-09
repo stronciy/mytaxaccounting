@@ -103,6 +103,9 @@ export async function POST(req: NextRequest) {
   let nextTagId = 1001
   let nextCategoryId = 2001
 
+  const summary = items.map((it, idx) => ({ idx, method: (it.method || 'GET').toUpperCase(), path: it.path || '' }))
+  logInfo('batch.summary', { requestId, count: items.length, items: summary })
+
   for (const item of items) {
     const method = (item.method || 'GET').toUpperCase()
     const pathStr = item.path || ''
@@ -296,6 +299,8 @@ export async function POST(req: NextRequest) {
     responses.push({ status: 404, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: 'not_found', message: 'Endpoint not implemented' }) })
   }
 
+  const statuses = responses.map((r) => r.status)
+  logInfo('batch.responses_summary', { requestId, count: responses.length, statuses })
   return NextResponse.json({ responses }, { headers: {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Methods': 'GET,POST,OPTIONS,HEAD',
