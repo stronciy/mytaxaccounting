@@ -1,7 +1,8 @@
 const WP_BASE_URL = process.env.NEXT_PUBLIC_WP_BASE_URL
+const SITE_BASE_URL = process.env.NEXT_PUBLIC_SITE_URL
 
 function buildUrl(path: string, params?: Record<string, string | number | boolean>) {
-  const base = WP_BASE_URL
+  const base = WP_BASE_URL || SITE_BASE_URL
   const hasBase = typeof base === 'string' && base.length > 0
   if (hasBase) {
     const url = new URL(path, base)
