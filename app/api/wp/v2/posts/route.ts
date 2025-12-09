@@ -48,7 +48,11 @@ export async function GET(req: NextRequest) {
   }))
 
   logInfo('wp.posts.get.response', { requestId, count: wpShape.length })
-  return NextResponse.json(wpShape)
+  return NextResponse.json(wpShape, { headers: {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET,POST,OPTIONS,HEAD',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-blaze-auth',
+  } })
 }
 
 export async function POST(req: NextRequest) {
@@ -65,18 +69,33 @@ export async function POST(req: NextRequest) {
 
   if (userAgent !== 'Blaze' || !authHeader) {
     logError('wp.posts.post.forbidden', { requestId, reason: 'UA or token missing' })
-    return NextResponse.json({ code: 'rest_cannot_access', message: 'Forbidden' }, { status: 403 })
+    return NextResponse.json({ code: 'rest_cannot_access', message: 'Forbidden' }, { status: 403, headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET,POST,OPTIONS,HEAD',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-blaze-auth',
+    } })
   }
 
   try {
     const decoded = jwt.verify(authHeader, SECRET) as any
-    if (decoded.iss !== req.nextUrl.origin || !decoded.data?.user_id) {
+    const forwardedHost = req.headers.get('x-forwarded-host')
+    const forwardedProto = req.headers.get('x-forwarded-proto') || 'https'
+    const publicOrigin = process.env.NEXT_PUBLIC_SITE_URL || (forwardedHost ? `${forwardedProto}://${forwardedHost}` : req.nextUrl.origin)
+    if (decoded.iss !== publicOrigin || !decoded.data?.user_id) {
       logError('wp.posts.post.invalid_token', { requestId })
-      return NextResponse.json({ code: 'rest_token_invalid', message: 'Invalid token' }, { status: 401 })
+      return NextResponse.json({ code: 'rest_token_invalid', message: 'Invalid token' }, { status: 401, headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET,POST,OPTIONS,HEAD',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-blaze-auth',
+      } })
     }
   } catch {
     logError('wp.posts.post.verify_failed', { requestId })
-    return NextResponse.json({ code: 'rest_token_invalid', message: 'Invalid token' }, { status: 401 })
+    return NextResponse.json({ code: 'rest_token_invalid', message: 'Invalid token' }, { status: 401, headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET,POST,OPTIONS,HEAD',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-blaze-auth',
+    } })
   }
 
   try {
@@ -119,9 +138,40 @@ export async function POST(req: NextRequest) {
     }
 
     logInfo('wp.posts.post.created', { requestId, id, slug: slugText })
-    return NextResponse.json(response, { status: 201 })
+    return NextResponse.json(response, { status: 201, headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET,POST,OPTIONS,HEAD',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-blaze-auth',
+    } })
   } catch (error) {
     logError('wp.posts.post.error', { requestId, error: String(error) })
-    return NextResponse.json({ code: 'rest_cannot_create', message: 'Error creating post' }, { status: 500 })
+    return NextResponse.json({ code: 'rest_cannot_create', message: 'Error creating post' }, { status: 500, headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET,POST,OPTIONS,HEAD',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-blaze-auth',
+    } })
   }
+}
+
+export async function HEAD() {
+  return new NextResponse(null, {
+    status: 200,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET,POST,OPTIONS,HEAD',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-blaze-auth',
+    },
+  })
+}
+
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 204,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET,POST,OPTIONS,HEAD',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-blaze-auth',
+      'Access-Control-Max-Age': '86400',
+    },
+  })
 }
