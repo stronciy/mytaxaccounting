@@ -5,6 +5,16 @@ import path from 'path'
 const DB_PATH = path.join(process.cwd(), 'data', 'app.sqlite')
 let dbPromise: Promise<Database> | null = null
 
+function resolveDistFile(rel: string) {
+  try {
+    // Prefer absolute path from node_modules
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    return require.resolve(rel)
+  } catch {
+    return path.join(process.cwd(), 'node_modules', rel)
+  }
+}
+
 async function ensureDir() {
   await fs.mkdir(path.dirname(DB_PATH), { recursive: true })
 }
@@ -18,7 +28,7 @@ async function persist(db: Database) {
 export async function getDb() {
   if (!dbPromise) {
     dbPromise = (async () => {
-      const SQL = await initSqlJs()
+      const SQL = await initSqlJs({ locateFile: (file) => resolveDistFile(`sql.js/dist/${file}`) })
       let db: Database
       try {
         const file = await fs.readFile(DB_PATH)
