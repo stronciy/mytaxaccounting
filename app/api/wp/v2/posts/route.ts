@@ -127,6 +127,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json()
+    logInfo('wp.posts.post.body_raw', { requestId, body })
     const { title, content, status = 'publish', date, slug, excerpt, categories = [] } = body
 
     const titleText = typeof title === 'object' ? title?.rendered : title

@@ -28,6 +28,32 @@ function getOrigin(req: NextRequest) {
   return process.env.NEXT_PUBLIC_SITE_URL || (forwardedHost ? `${forwardedProto}://${forwardedHost}` : req.nextUrl.origin)
 }
 
+function normalizePath(p: string) {
+  const qIndex = p.indexOf('?')
+  const clean = qIndex >= 0 ? p.slice(0, qIndex) : p
+  return clean.replace(/^\s+|\s+$/g, '').replace(/^\/wp-json/, '')
+}
+
+function pickText(v: any) {
+  if (typeof v === 'object' && v !== null) {
+    return typeof v.raw === 'string' ? v.raw : (typeof v.rendered === 'string' ? v.rendered : '')
+  }
+  return typeof v === 'string' ? v : ''
+}
+
+function sanitizeHeaders(h: Record<string, string>) {
+  const out: Record<string, string> = {}
+  Object.entries(h).forEach(([k, v]) => {
+    const key = k.toLowerCase()
+    if (key === 'authorization' || key === 'x-blaze-auth') {
+      out[k] = 'REDACTED'
+    } else {
+      out[k] = v
+    }
+  })
+  return out
+}
+
 export async function POST(req: NextRequest) {
   const requestId = makeRequestId()
   logInfo('batch.request', { requestId, req: sanitizeRequest(req) })
@@ -77,21 +103,31 @@ export async function POST(req: NextRequest) {
   for (const item of items) {
     const method = (item.method || 'GET').toUpperCase()
     const pathStr = item.path || ''
+    logInfo('batch.item.start', { requestId, method, path: pathStr })
     const headers = item.headers || {}
     const bearer = headers['authorization']?.replace('Bearer ', '')
     const token = headers['x-blaze-auth'] || bearer || outerAuth
+    logInfo('batch.item.headers', { requestId, headers: sanitizeHeaders(headers) })
+    logInfo('batch.item.auth', { requestId, source: {
+      hasXBlazeAuth: Boolean(headers['x-blaze-auth']),
+      hasAuthorization: Boolean(headers['authorization']),
+      usedOuterAuth: Boolean(!headers['x-blaze-auth'] && !headers['authorization'] && outerAuth),
+      tokenPresent: Boolean(token),
+    } })
 
-    if (pathStr.startsWith('/wp/v2/posts') && method === 'POST') {
+    const normalized = normalizePath(pathStr)
+    if (normalized.startsWith('/wp/v2/posts') && method === 'POST') {
+      logInfo('batch.posts.body_raw', { requestId, body: item.body })
       if (!token) {
         logError('batch.posts.no_token', { requestId })
-        responses.push({ status: 403, headers: {}, body: { code: 'rest_cannot_access', message: 'Forbidden' } })
+        responses.push({ status: 403, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: 'rest_cannot_access', message: 'Forbidden' }) })
         continue
       }
       try {
         const decoded = jwt.verify(token, SECRET, { algorithms: ['HS256'], issuer: publicOrigin, clockTolerance: 240 }) as any
         if (!decoded.data?.user_id) {
           logError('batch.posts.bad_request', { requestId })
-          responses.push({ status: 401, headers: {}, body: { code: 'bad_request', message: 'Incomplete data', data: { status: 401 } } })
+          responses.push({ status: 401, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: 'bad_request', message: 'Incomplete data', data: { status: 401 } }) })
           continue
         }
         logInfo('batch.posts.token_ok', { requestId, userId: decoded.data.user_id })
@@ -99,29 +135,30 @@ export async function POST(req: NextRequest) {
         const msg = String(e?.message || '')
         if (msg.includes('jwt issuer invalid')) {
           logError('batch.posts.bad_issuer', { requestId })
-          responses.push({ status: 401, headers: {}, body: { code: 'bad_issuer', message: 'The issuer does not match with this server', data: { status: 401 } } })
+          responses.push({ status: 401, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: 'bad_issuer', message: 'The issuer does not match with this server', data: { status: 401 } }) })
           continue
         }
         if (e?.name === 'TokenExpiredError') {
           logError('batch.posts.invalid_token_expired', { requestId })
-          responses.push({ status: 403, headers: {}, body: { code: 'invalid_token', message: 'Expired token', data: { status: 403 } } })
+          responses.push({ status: 403, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: 'invalid_token', message: 'Expired token', data: { status: 403 } }) })
           continue
         }
         if (msg.includes('invalid signature')) {
           logError('batch.posts.invalid_token_signature', { requestId })
-          responses.push({ status: 403, headers: {}, body: { code: 'invalid_token', message: 'Signature verification failed', data: { status: 403 } } })
+          responses.push({ status: 403, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: 'invalid_token', message: 'Signature verification failed', data: { status: 403 } }) })
           continue
         }
         logError('batch.posts.verify_failed', { requestId })
-        responses.push({ status: 401, headers: {}, body: { code: 'rest_token_invalid', message: 'Invalid token' } })
+        responses.push({ status: 401, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: 'rest_token_invalid', message: 'Invalid token' }) })
         continue
       }
 
       try {
         const body = item.body || {}
         const { title, content, status = 'publish', date, slug, excerpt, categories = [] } = body
-        const titleText = typeof title === 'object' ? title?.rendered : title
-        const contentHtml = typeof content === 'object' ? content?.rendered : content
+        const titleText = pickText(title)
+        const contentHtml = pickText(content)
+        const excerptText = pickText(excerpt)
         const publishedAt = date ? new Date(date).toISOString() : new Date().toISOString()
         const slugText = slug || String(titleText || '')
           .toLowerCase()
@@ -144,7 +181,7 @@ export async function POST(req: NextRequest) {
           id,
           title: titleText,
           content: contentHtml,
-          excerpt: excerpt || '',
+          excerpt: excerptText || '',
           slug: slugText,
           status,
           publishedAt,
@@ -161,22 +198,23 @@ export async function POST(req: NextRequest) {
           date: publishedAt,
           title: { rendered: titleText },
           content: { rendered: contentHtml },
-          excerpt: { rendered: excerpt || '' },
+          excerpt: { rendered: excerptText || '' },
           slug: slugText,
           status,
           link: `${req.nextUrl.origin}/blog/${slugText}`,
         }
 
         logInfo('batch.posts.created', { requestId, id, slug: slugText })
-        responses.push({ status: 201, headers: {}, body: response })
+        responses.push({ status: 201, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(response) })
       } catch (error: any) {
         logError('batch.posts.error', { requestId, error: String(error) })
-        responses.push({ status: 500, headers: {}, body: { code: 'rest_cannot_create', message: 'Error creating post' } })
+        responses.push({ status: 500, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: 'rest_cannot_create', message: 'Error creating post' }) })
       }
       continue
     }
 
-    responses.push({ status: 404, headers: {}, body: { code: 'not_found', message: 'Endpoint not implemented' } })
+    logError('batch.item.unhandled', { requestId, method, path: pathStr })
+    responses.push({ status: 404, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: 'not_found', message: 'Endpoint not implemented' }) })
   }
 
   return NextResponse.json({ responses }, { headers: {
