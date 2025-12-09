@@ -1,10 +1,16 @@
 const WP_BASE_URL = process.env.NEXT_PUBLIC_WP_BASE_URL
 
 function buildUrl(path: string, params?: Record<string, string | number | boolean>) {
-  if (!WP_BASE_URL) throw new Error('NEXT_PUBLIC_WP_BASE_URL is not set')
-  const url = new URL(path, WP_BASE_URL)
-  if (params) Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, String(v)))
-  return url.toString()
+  const base = WP_BASE_URL
+  const hasBase = typeof base === 'string' && base.length > 0
+  if (hasBase) {
+    const url = new URL(path, base)
+    if (params) Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, String(v)))
+    return url.toString()
+  }
+  const qp = params ? new URLSearchParams(Object.entries(params).map(([k, v]) => [k, String(v)])) : null
+  const cleanPath = path.startsWith('/') ? path : `/${path}`
+  return qp ? `${cleanPath}?${qp.toString()}` : cleanPath
 }
 
 function sanitizeHtml(html: string) {
