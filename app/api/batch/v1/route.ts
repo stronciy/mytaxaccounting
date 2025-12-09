@@ -158,7 +158,7 @@ export async function POST(req: NextRequest) {
 
       try {
         const body = item.body || {}
-        const { title, content, status = 'publish', date, slug, excerpt, categories = [] } = body
+        const { title, content, status = 'publish', date, slug, excerpt, categories = [], tags = [] } = body
         const titleText = pickText(title)
         const contentHtml = pickText(content)
         const excerptText = pickText(excerpt)
@@ -167,6 +167,8 @@ export async function POST(req: NextRequest) {
           .toLowerCase()
           .replace(/\s+/g, '-')
           .replace(/[^a-z0-9-]/g, '')
+        const tagIds = Array.isArray(tags) ? tags.filter((n: any) => Number.isFinite(n)).map((n: any) => Number(n)) : []
+        const categoryIds = Array.isArray(categories) ? categories.filter((n: any) => Number.isFinite(n)).map((n: any) => Number(n)) : []
 
         logInfo('batch.posts.body_parsed', {
           requestId,
@@ -178,7 +180,7 @@ export async function POST(req: NextRequest) {
           categoriesCount: Array.isArray(categories) ? categories.length : 0,
         })
 
-        const id = await insertPost({ title: titleText, content: contentHtml, excerpt: excerptText || '', slug: slugText, status, publishedAt, authorId: 1 })
+        const id = await insertPost({ title: titleText, content: contentHtml, excerpt: excerptText || '', slug: slugText, status, publishedAt, authorId: 1, tagsIds: tagIds, categoriesIds: categoryIds })
         logInfo('batch.posts.store_prepare', { requestId, id, slug: slugText })
         logInfo('batch.posts.store_written', { requestId })
 
@@ -194,6 +196,7 @@ export async function POST(req: NextRequest) {
         }
 
         logInfo('batch.posts.created', { requestId, id, slug: slugText })
+        logInfo('batch.posts.terms_linked', { requestId, tagsCount: tagIds.length, categoriesCount: categoryIds.length })
         responses.push({ status: 201, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(response) })
       } catch (error: any) {
         logError('batch.posts.error', { requestId, error: String(error) })

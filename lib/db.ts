@@ -114,7 +114,7 @@ export async function upsertCategory({ name, slug, description = '' }: { name: s
   return id
 }
 
-export async function insertPost({ title, content, excerpt = '', slug, status = 'publish', publishedAt, authorId = 1 }: {
+export async function insertPost({ title, content, excerpt = '', slug, status = 'publish', publishedAt, authorId = 1, tagsIds = [], categoriesIds = [] }: {
   title: string
   content: string
   excerpt?: string
@@ -122,6 +122,8 @@ export async function insertPost({ title, content, excerpt = '', slug, status = 
   status?: string
   publishedAt: string
   authorId?: number
+  tagsIds?: number[]
+  categoriesIds?: number[]
 }) {
   const db = await getDb()
   const stmt = db.prepare('INSERT INTO posts(title, content, excerpt, slug, status, published_at, author_id) VALUES(?,?,?,?,?,?,?)')
@@ -131,6 +133,18 @@ export async function insertPost({ title, content, excerpt = '', slug, status = 
   lastIdStmt.step()
   const id = (lastIdStmt.getAsObject().id as number) || 0
   lastIdStmt.free()
+
+  if (Array.isArray(tagsIds) && tagsIds.length) {
+    const tStmt = db.prepare('INSERT OR IGNORE INTO post_tags(post_id, tag_id) VALUES(?, ?)')
+    for (const tid of tagsIds) tStmt.run([id, tid])
+    tStmt.free()
+  }
+  if (Array.isArray(categoriesIds) && categoriesIds.length) {
+    const cStmt = db.prepare('INSERT OR IGNORE INTO post_categories(post_id, category_id) VALUES(?, ?)')
+    for (const cid of categoriesIds) cStmt.run([id, cid])
+    cStmt.free()
+  }
+
   await persist(db)
   return id
 }

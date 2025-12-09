@@ -112,7 +112,7 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
     logInfo('wp.posts.post.body_raw', { requestId, body })
-    const { title, content, status = 'publish', date, slug, excerpt, categories = [] } = body
+    const { title, content, status = 'publish', date, slug, excerpt, categories = [], tags = [] } = body
 
     const titleText = typeof title === 'object' ? title?.rendered : title
     const contentHtml = typeof content === 'object' ? content?.rendered : content
@@ -132,7 +132,9 @@ export async function POST(req: NextRequest) {
       categoriesCount: Array.isArray(categories) ? categories.length : 0,
     })
 
-    const id = await insertPost({ title: titleText, content: contentHtml, excerpt: excerpt || '', slug: slugText, status, publishedAt, authorId: 1 })
+    const tagIds = Array.isArray(tags) ? tags.filter((n: any) => Number.isFinite(n)).map((n: any) => Number(n)) : []
+    const categoryIds = Array.isArray(categories) ? categories.filter((n: any) => Number.isFinite(n)).map((n: any) => Number(n)) : []
+    const id = await insertPost({ title: titleText, content: contentHtml, excerpt: excerpt || '', slug: slugText, status, publishedAt, authorId: 1, tagsIds: tagIds, categoriesIds: categoryIds })
     logInfo('wp.posts.post.store_prepare', { requestId, id, slug: slugText })
     logInfo('wp.posts.post.store_written', { requestId })
 
