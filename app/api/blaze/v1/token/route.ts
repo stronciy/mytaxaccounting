@@ -11,7 +11,11 @@ export async function POST(req: NextRequest) {
   logInfo('blaze.token.request', { requestId, req: sanitizeRequest(req) })
   if (!SECRET || !USERNAME || !PASSWORD) {
     logError('blaze.token.error', { requestId, error: 'Server not configured' })
-    return NextResponse.json({ error: 'Server not configured' }, { status: 500 })
+    return NextResponse.json({ error: 'Server not configured' }, { status: 500, headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET,POST,OPTIONS,HEAD',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-blaze-auth',
+    } })
   }
 
   const { username, password } = await req.json()
@@ -35,11 +39,42 @@ export async function POST(req: NextRequest) {
 
   const token = jwt.sign(payload, SECRET, { algorithm: 'HS256' })
   logInfo('blaze.token.issued', { requestId, userId: 1 })
-  return NextResponse.json({ token })
+  return NextResponse.json({ token }, { headers: {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET,POST,OPTIONS,HEAD',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-blaze-auth',
+  } })
 }
 
 export async function GET(req: NextRequest) {
   const requestId = makeRequestId()
   logInfo('blaze.token.route_check', { requestId, req: sanitizeRequest(req) })
-  return NextResponse.json({ ok: true, method: 'POST' })
+  return NextResponse.json({ ok: true, method: 'POST' }, { headers: {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET,POST,OPTIONS,HEAD',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-blaze-auth',
+  } })
+}
+
+export async function HEAD() {
+  return new NextResponse(null, {
+    status: 200,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET,POST,OPTIONS,HEAD',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-blaze-auth',
+    },
+  })
+}
+
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 204,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET,POST,OPTIONS,HEAD',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-blaze-auth',
+      'Access-Control-Max-Age': '86400',
+    },
+  })
 }
