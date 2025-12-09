@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import jwt from 'jsonwebtoken'
 import { promises as fs } from 'fs'
 import path from 'path'
+import { upsertTag, upsertCategory, insertPost } from '@/lib/db'
 import { logInfo, logError, makeRequestId, sanitizeRequest } from '@/lib/logger'
 
 const SECRET = process.env.BLAZE_SECRET as string
@@ -177,23 +178,9 @@ export async function POST(req: NextRequest) {
           categoriesCount: Array.isArray(categories) ? categories.length : 0,
         })
 
-        const posts = await readStore()
-        const id = posts.length ? Math.max(...posts.map((p) => p.id)) + 1 : 1
-        const newPost = {
-          id,
-          title: titleText,
-          content: contentHtml,
-          excerpt: excerptText || '',
-          slug: slugText,
-          status,
-          publishedAt,
-          categories,
-          authorId: 1,
-        }
+        const id = await insertPost({ title: titleText, content: contentHtml, excerpt: excerptText || '', slug: slugText, status, publishedAt, authorId: 1 })
         logInfo('batch.posts.store_prepare', { requestId, id, slug: slugText })
-        posts.unshift(newPost)
-        await writeStore(posts)
-        logInfo('batch.posts.store_written', { requestId, total: posts.length })
+        logInfo('batch.posts.store_written', { requestId })
 
         const response = {
           id,
@@ -233,7 +220,7 @@ export async function POST(req: NextRequest) {
       const name = pickText(body.name) || pickText(body.title) || ''
       const slug = body.slug || String(name || '').toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
       const description = pickText(body.description)
-      const id = nextTagId++
+      const id = await upsertTag({ name, slug, description })
       const term = {
         id,
         name,
@@ -265,7 +252,7 @@ export async function POST(req: NextRequest) {
       const name = pickText(body.name) || pickText(body.title) || ''
       const slug = body.slug || String(name || '').toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
       const description = pickText(body.description)
-      const id = nextCategoryId++
+      const id = await upsertCategory({ name, slug, description })
       const term = {
         id,
         name,

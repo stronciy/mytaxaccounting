@@ -2,25 +2,16 @@ import { NextRequest, NextResponse } from 'next/server'
 import jwt from 'jsonwebtoken'
 import { promises as fs } from 'fs'
 import path from 'path'
+import { insertPost, getPostsFromDb } from '@/lib/db'
 import { logInfo, logError, makeRequestId, sanitizeRequest } from '@/lib/logger'
 
 const SECRET = process.env.BLAZE_SECRET as string
 const STORE_PATH = path.join(process.cwd(), 'data', 'blog-local.json')
 
 async function readStore(): Promise<any[]> {
-  try {
-    const data = await fs.readFile(STORE_PATH, 'utf8')
-    return JSON.parse(data)
-  } catch (e: any) {
-    if (e.code === 'ENOENT') return []
-    throw e
-  }
+  return []
 }
-
-async function writeStore(posts: any[]) {
-  await fs.mkdir(path.dirname(STORE_PATH), { recursive: true })
-  await fs.writeFile(STORE_PATH, JSON.stringify(posts, null, 2), 'utf8')
-}
+async function writeStore(posts: any[]) {}
 
 export async function GET(req: NextRequest) {
   const requestId = makeRequestId()
@@ -29,17 +20,10 @@ export async function GET(req: NextRequest) {
   const perPage = Number(url.searchParams.get('per_page') ?? 10)
   const page = Number(url.searchParams.get('page') ?? 1)
   const slug = url.searchParams.get('slug')
-  const posts = await readStore()
-
-  let filtered = posts
-  if (slug) filtered = filtered.filter((p) => p.slug === slug)
-
-  const start = (page - 1) * perPage
-  const paged = filtered.slice(start, start + perPage)
-
-  const wpShape = paged.map((p) => ({
+  const rows = await getPostsFromDb({ page, perPage, slug })
+  const wpShape = rows.map((p: any) => ({
     id: p.id,
-    date: p.publishedAt,
+    date: p.published_at,
     title: { rendered: p.title },
     content: { rendered: p.content },
     excerpt: { rendered: p.excerpt ?? '' },
@@ -148,24 +132,9 @@ export async function POST(req: NextRequest) {
       categoriesCount: Array.isArray(categories) ? categories.length : 0,
     })
 
-    const posts = await readStore()
-    const id = posts.length ? Math.max(...posts.map((p) => p.id)) + 1 : 1
-    const newPost = {
-      id,
-      title: titleText,
-      content: contentHtml,
-      excerpt: excerpt || '',
-      slug: slugText,
-      status,
-      publishedAt,
-      categories,
-      authorId: 1,
-    }
+    const id = await insertPost({ title: titleText, content: contentHtml, excerpt: excerpt || '', slug: slugText, status, publishedAt, authorId: 1 })
     logInfo('wp.posts.post.store_prepare', { requestId, id, slug: slugText })
-    posts.unshift(newPost)
-    await writeStore(posts)
-
-    logInfo('wp.posts.post.store_written', { requestId, total: posts.length })
+    logInfo('wp.posts.post.store_written', { requestId })
 
     const response = {
       id,
