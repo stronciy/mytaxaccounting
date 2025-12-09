@@ -137,9 +137,24 @@ export async function insertPost({ title, content, excerpt = '', slug, status = 
 }) {
   const db = await getDb()
   logInfo('db.posts.insert.start', { slug, status, tagsCount: tagsIds.length, categoriesCount: categoriesIds.length })
-  const stmt = db.prepare('INSERT INTO posts(title, content, excerpt, slug, status, published_at, author_id) VALUES(?,?,?,?,?,?,?)')
-  stmt.run([title, content, excerpt, slug, status, publishedAt, authorId])
-  stmt.free()
+  let currentSlug = slug
+  let inserted = false
+  while (!inserted) {
+    try {
+      const stmt = db.prepare('INSERT INTO posts(title, content, excerpt, slug, status, published_at, author_id) VALUES(?,?,?,?,?,?,?)')
+      stmt.run([title, content, excerpt, currentSlug, status, publishedAt, authorId])
+      stmt.free()
+      inserted = true
+    } catch (e: any) {
+      const msg = String(e?.message || e)
+      logError('db.posts.insert.error', { slug: currentSlug, error: msg })
+      if (msg.includes('UNIQUE') && msg.toLowerCase().includes('posts.slug')) {
+        currentSlug = `${slug}-${Math.random().toString(36).slice(2, 6)}`
+        continue
+      }
+      throw e
+    }
+  }
   const lastIdStmt = db.prepare('SELECT last_insert_rowid() AS id')
   lastIdStmt.step()
   const id = (lastIdStmt.getAsObject().id as number) || 0
@@ -159,7 +174,7 @@ export async function insertPost({ title, content, excerpt = '', slug, status = 
   }
 
   await persist(db)
-  logInfo('db.posts.insert.done', { id, slug })
+  logInfo('db.posts.insert.done', { id, slug: currentSlug })
   return id
 }
 

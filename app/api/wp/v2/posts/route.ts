@@ -114,17 +114,31 @@ export async function POST(req: NextRequest) {
     logInfo('wp.posts.post.body_raw', { requestId, body })
     const { title, content, status = 'publish', date, slug, excerpt, categories = [], tags = [] } = body
 
-    const titleText = typeof title === 'object' ? title?.rendered : title
-    const contentHtml = typeof content === 'object' ? content?.rendered : content
+    const titleText = typeof title === 'object' ? (title?.raw ?? title?.rendered) : title
+    const contentHtml = typeof content === 'object' ? (content?.raw ?? content?.rendered) : content
     const publishedAt = date ? new Date(date).toISOString() : new Date().toISOString()
-    const slugText = slug || String(titleText || '')
+    const contentText = typeof contentHtml === 'string' ? contentHtml : ''
+    const plain = contentText.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()
+    const fallbackTitle = (typeof titleText === 'string' && titleText) ? titleText : plain.slice(0, 80)
+    const finalTitle = fallbackTitle || 'Untitled'
+    let slugText = slug || String(finalTitle || '')
       .toLowerCase()
       .replace(/\s+/g, '-')
       .replace(/[^a-z0-9-]/g, '')
+    if (!slugText) slugText = `post-${Date.now()}`
+
+    if (!plain && !contentText) {
+      logError('wp.posts.post.bad_request_empty', { requestId })
+      return NextResponse.json({ code: 'bad_request', message: 'Empty content', data: { status: 400 } }, { status: 400, headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET,POST,OPTIONS,HEAD',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-blaze-auth',
+      } })
+    }
 
     logInfo('wp.posts.post.body_parsed', {
       requestId,
-      title: String(titleText || ''),
+      title: String(finalTitle || ''),
       slug: slugText,
       status,
       contentLen: typeof contentHtml === 'string' ? contentHtml.length : 0,
@@ -157,14 +171,14 @@ export async function POST(req: NextRequest) {
       categoryIds = resolved
     }
     logInfo('wp.posts.post.terms_linked', { requestId, tagsCount: tagIds.length, categoriesCount: categoryIds.length, tagIds, categoryIds })
-    const id = await insertPost({ title: titleText, content: contentHtml, excerpt: excerpt || '', slug: slugText, status, publishedAt, authorId: 1, tagsIds: tagIds, categoriesIds: categoryIds })
+    const id = await insertPost({ title: finalTitle, content: contentHtml, excerpt: excerpt || '', slug: slugText, status, publishedAt, authorId: 1, tagsIds: tagIds, categoriesIds: categoryIds })
     logInfo('wp.posts.post.store_prepare', { requestId, id, slug: slugText })
     logInfo('wp.posts.post.store_written', { requestId })
 
     const response = {
       id,
       date: publishedAt,
-      title: { rendered: titleText },
+      title: { rendered: finalTitle },
       content: { rendered: contentHtml },
       excerpt: { rendered: excerpt || '' },
       slug: slugText,

@@ -166,10 +166,20 @@ export async function POST(req: NextRequest) {
         const contentHtml = pickText(content)
         const excerptText = pickText(excerpt)
         const publishedAt = date ? new Date(date).toISOString() : new Date().toISOString()
-        const slugText = slug || String(titleText || '')
+        const contentText = typeof contentHtml === 'string' ? contentHtml : ''
+        const plain = contentText.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()
+        const fallbackTitle = (typeof titleText === 'string' && titleText) ? titleText : plain.slice(0, 80)
+        const finalTitle = fallbackTitle || 'Untitled'
+        let slugText = slug || String(finalTitle || '')
           .toLowerCase()
           .replace(/\s+/g, '-')
           .replace(/[^a-z0-9-]/g, '')
+        if (!slugText) slugText = `post-${Date.now()}`
+        if (!plain && !contentText) {
+          logError('batch.posts.bad_request_empty', { requestId })
+          responses.push({ status: 400, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: 'bad_request', message: 'Empty content', data: { status: 400 } }) })
+          continue
+        }
         let tagIds = Array.isArray(tags) ? tags.filter((n: any) => Number.isFinite(n)).map((n: any) => Number(n)) : []
         let categoryIds = Array.isArray(categories) ? categories.filter((n: any) => Number.isFinite(n)).map((n: any) => Number(n)) : []
         // Resolve non-numeric tags/categories by upserting and collecting IDs
@@ -206,14 +216,14 @@ export async function POST(req: NextRequest) {
           categoriesCount: Array.isArray(categories) ? categories.length : 0,
         })
 
-        const id = await insertPost({ title: titleText, content: contentHtml, excerpt: excerptText || '', slug: slugText, status, publishedAt, authorId: 1, tagsIds: tagIds, categoriesIds: categoryIds })
+        const id = await insertPost({ title: finalTitle, content: contentHtml, excerpt: excerptText || '', slug: slugText, status, publishedAt, authorId: 1, tagsIds: tagIds, categoriesIds: categoryIds })
         logInfo('batch.posts.store_prepare', { requestId, id, slug: slugText })
         logInfo('batch.posts.store_written', { requestId })
 
         const response = {
           id,
           date: publishedAt,
-          title: { rendered: titleText },
+          title: { rendered: finalTitle },
           content: { rendered: contentHtml },
           excerpt: { rendered: excerptText || '' },
           slug: slugText,
