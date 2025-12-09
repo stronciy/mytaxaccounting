@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import jwt from 'jsonwebtoken'
 import { promises as fs } from 'fs'
 import path from 'path'
-import { insertPost, getPostsFromDb } from '@/lib/db'
+import { insertPost, getPostsFromDb, upsertTag, upsertCategory } from '@/lib/db'
 import { logInfo, logError, makeRequestId, sanitizeRequest } from '@/lib/logger'
 
 const SECRET = process.env.BLAZE_SECRET as string
@@ -132,8 +132,31 @@ export async function POST(req: NextRequest) {
       categoriesCount: Array.isArray(categories) ? categories.length : 0,
     })
 
-    const tagIds = Array.isArray(tags) ? tags.filter((n: any) => Number.isFinite(n)).map((n: any) => Number(n)) : []
-    const categoryIds = Array.isArray(categories) ? categories.filter((n: any) => Number.isFinite(n)).map((n: any) => Number(n)) : []
+    let tagIds = Array.isArray(tags) ? tags.filter((n: any) => Number.isFinite(n)).map((n: any) => Number(n)) : []
+    let categoryIds = Array.isArray(categories) ? categories.filter((n: any) => Number.isFinite(n)).map((n: any) => Number(n)) : []
+    if (Array.isArray(tags) && tags.length && tagIds.length !== tags.length) {
+      const resolved: number[] = []
+      for (const t of tags) {
+        if (Number.isFinite(t)) { resolved.push(Number(t)); continue }
+        const name = typeof t === 'string' ? t : (t?.name || '')
+        const slugT = (t?.slug) || String(name || '').toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
+        const idT = await upsertTag({ name, slug: slugT, description: '' })
+        resolved.push(idT)
+      }
+      tagIds = resolved
+    }
+    if (Array.isArray(categories) && categories.length && categoryIds.length !== categories.length) {
+      const resolved: number[] = []
+      for (const c of categories) {
+        if (Number.isFinite(c)) { resolved.push(Number(c)); continue }
+        const name = typeof c === 'string' ? c : (c?.name || '')
+        const slugC = (c?.slug) || String(name || '').toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
+        const idC = await upsertCategory({ name, slug: slugC, description: '' })
+        resolved.push(idC)
+      }
+      categoryIds = resolved
+    }
+    logInfo('wp.posts.post.terms_linked', { requestId, tagsCount: tagIds.length, categoriesCount: categoryIds.length, tagIds, categoryIds })
     const id = await insertPost({ title: titleText, content: contentHtml, excerpt: excerpt || '', slug: slugText, status, publishedAt, authorId: 1, tagsIds: tagIds, categoriesIds: categoryIds })
     logInfo('wp.posts.post.store_prepare', { requestId, id, slug: slugText })
     logInfo('wp.posts.post.store_written', { requestId })

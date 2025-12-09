@@ -1,4 +1,5 @@
 import initSqlJs, { Database, Statement } from 'sql.js'
+import { logInfo, logError } from '@/lib/logger'
 import { promises as fs } from 'fs'
 import path from 'path'
 
@@ -80,6 +81,7 @@ export async function getDb() {
 
 export async function upsertTag({ name, slug, description = '' }: { name: string; slug: string; description?: string }) {
   const db = await getDb()
+  logInfo('db.tags.upsert.start', { name, slug })
   const select = db.prepare('SELECT id FROM tags WHERE slug = ?')
   select.bind([slug])
   const row = select.step() ? select.getAsObject() : null
@@ -93,11 +95,13 @@ export async function upsertTag({ name, slug, description = '' }: { name: string
   const id = (lastIdStmt.getAsObject().id as number) || 0
   lastIdStmt.free()
   await persist(db)
+  logInfo('db.tags.upsert.done', { id, slug })
   return id
 }
 
 export async function upsertCategory({ name, slug, description = '' }: { name: string; slug: string; description?: string }) {
   const db = await getDb()
+  logInfo('db.categories.upsert.start', { name, slug })
   const select = db.prepare('SELECT id FROM categories WHERE slug = ?')
   select.bind([slug])
   const row = select.step() ? select.getAsObject() : null
@@ -111,6 +115,7 @@ export async function upsertCategory({ name, slug, description = '' }: { name: s
   const id = (lastIdStmt.getAsObject().id as number) || 0
   lastIdStmt.free()
   await persist(db)
+  logInfo('db.categories.upsert.done', { id, slug })
   return id
 }
 
@@ -126,6 +131,7 @@ export async function insertPost({ title, content, excerpt = '', slug, status = 
   categoriesIds?: number[]
 }) {
   const db = await getDb()
+  logInfo('db.posts.insert.start', { slug, status, tagsCount: tagsIds.length, categoriesCount: categoriesIds.length })
   const stmt = db.prepare('INSERT INTO posts(title, content, excerpt, slug, status, published_at, author_id) VALUES(?,?,?,?,?,?,?)')
   stmt.run([title, content, excerpt, slug, status, publishedAt, authorId])
   stmt.free()
@@ -138,14 +144,17 @@ export async function insertPost({ title, content, excerpt = '', slug, status = 
     const tStmt = db.prepare('INSERT OR IGNORE INTO post_tags(post_id, tag_id) VALUES(?, ?)')
     for (const tid of tagsIds) tStmt.run([id, tid])
     tStmt.free()
+    logInfo('db.posts.link.tags', { postId: id, tagsIds })
   }
   if (Array.isArray(categoriesIds) && categoriesIds.length) {
     const cStmt = db.prepare('INSERT OR IGNORE INTO post_categories(post_id, category_id) VALUES(?, ?)')
     for (const cid of categoriesIds) cStmt.run([id, cid])
     cStmt.free()
+    logInfo('db.posts.link.categories', { postId: id, categoriesIds })
   }
 
   await persist(db)
+  logInfo('db.posts.insert.done', { id, slug })
   return id
 }
 

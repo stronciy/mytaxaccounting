@@ -167,8 +167,31 @@ export async function POST(req: NextRequest) {
           .toLowerCase()
           .replace(/\s+/g, '-')
           .replace(/[^a-z0-9-]/g, '')
-        const tagIds = Array.isArray(tags) ? tags.filter((n: any) => Number.isFinite(n)).map((n: any) => Number(n)) : []
-        const categoryIds = Array.isArray(categories) ? categories.filter((n: any) => Number.isFinite(n)).map((n: any) => Number(n)) : []
+        let tagIds = Array.isArray(tags) ? tags.filter((n: any) => Number.isFinite(n)).map((n: any) => Number(n)) : []
+        let categoryIds = Array.isArray(categories) ? categories.filter((n: any) => Number.isFinite(n)).map((n: any) => Number(n)) : []
+        // Resolve non-numeric tags/categories by upserting and collecting IDs
+        if (Array.isArray(tags) && tags.length && tagIds.length !== tags.length) {
+          const resolved: number[] = []
+          for (const t of tags) {
+            if (Number.isFinite(t)) { resolved.push(Number(t)); continue }
+            const name = typeof t === 'string' ? t : pickText(t?.name) || ''
+            const slugT = (t?.slug) || String(name || '').toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
+            const id = await upsertTag({ name, slug: slugT, description: '' })
+            resolved.push(id)
+          }
+          tagIds = resolved
+        }
+        if (Array.isArray(categories) && categories.length && categoryIds.length !== categories.length) {
+          const resolved: number[] = []
+          for (const c of categories) {
+            if (Number.isFinite(c)) { resolved.push(Number(c)); continue }
+            const name = typeof c === 'string' ? c : pickText(c?.name) || ''
+            const slugC = (c?.slug) || String(name || '').toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
+            const id = await upsertCategory({ name, slug: slugC, description: '' })
+            resolved.push(id)
+          }
+          categoryIds = resolved
+        }
 
         logInfo('batch.posts.body_parsed', {
           requestId,
@@ -196,7 +219,7 @@ export async function POST(req: NextRequest) {
         }
 
         logInfo('batch.posts.created', { requestId, id, slug: slugText })
-        logInfo('batch.posts.terms_linked', { requestId, tagsCount: tagIds.length, categoriesCount: categoryIds.length })
+        logInfo('batch.posts.terms_linked', { requestId, tagsCount: tagIds.length, categoriesCount: categoryIds.length, tagIds, categoryIds })
         responses.push({ status: 201, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(response) })
       } catch (error: any) {
         logError('batch.posts.error', { requestId, error: String(error) })
