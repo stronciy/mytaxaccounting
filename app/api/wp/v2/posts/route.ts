@@ -110,8 +110,28 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const body = await req.json()
-    logInfo('wp.posts.post.body_raw', { requestId, body })
+    const contentType = req.headers.get('content-type') || ''
+    let body: any = null
+    let rawText: string | undefined
+    if (contentType.includes('application/json')) {
+      try { body = await req.json() } catch {}
+    }
+    if (!body && (contentType.includes('application/x-www-form-urlencoded') || contentType.includes('text/plain'))) {
+      rawText = await req.text()
+      const params = new URLSearchParams(rawText)
+      body = Object.fromEntries(params)
+    }
+    if (!body && !rawText) {
+      rawText = await req.text()
+      try { body = JSON.parse(rawText) } catch {}
+    }
+    if (!body) {
+      const url = new URL(req.url)
+      body = {}
+      url.searchParams.forEach((v, k) => { (body as any)[k] = v })
+      rawText = rawText || ''
+    }
+    logInfo('wp.posts.post.body_raw', { requestId, contentType, rawTextLen: rawText ? rawText.length : 0, body })
     const { title, content, status = 'publish', date, slug, excerpt, categories = [], tags = [] } = body
 
     const titleText = typeof title === 'object' ? (title?.raw ?? title?.rendered) : title
