@@ -17,7 +17,8 @@ export async function GET(req: NextRequest) {
   }
 
   const userAgent = req.headers.get('user-agent')
-  if (userAgent !== 'Blaze') {
+  const ua = (userAgent || '').toLowerCase()
+  if (!ua.startsWith('blaze')) {
     logError('blaze.can_publish.forbidden', { requestId, reason: 'Invalid UA' })
     return NextResponse.json({ error: 'rest_cannot_access', message: 'Forbidden' }, { status: 403, headers: {
       'Access-Control-Allow-Origin': '*',

@@ -67,7 +67,8 @@ export async function POST(req: NextRequest) {
   const bearer = req.headers.get('authorization')?.replace('Bearer ', '')
   const authHeader = req.headers.get('x-blaze-auth') || bearer
 
-  if (userAgent !== 'Blaze' || !authHeader) {
+  const ua = (userAgent || '').toLowerCase()
+  if (!ua.startsWith('blaze') || !authHeader) {
     logError('wp.posts.post.forbidden', { requestId, reason: 'UA or token missing' })
     return NextResponse.json({ code: 'rest_cannot_access', message: 'Forbidden' }, { status: 403, headers: {
       'Access-Control-Allow-Origin': '*',
