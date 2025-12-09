@@ -77,11 +77,11 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const decoded = jwt.verify(authHeader, SECRET) as any
     const forwardedHost = req.headers.get('x-forwarded-host')
     const forwardedProto = req.headers.get('x-forwarded-proto') || 'https'
     const publicOrigin = process.env.NEXT_PUBLIC_SITE_URL || (forwardedHost ? `${forwardedProto}://${forwardedHost}` : req.nextUrl.origin)
-    if (decoded.iss !== publicOrigin || !decoded.data?.user_id) {
+    const decoded = jwt.verify(authHeader, SECRET, { algorithms: ['HS256'], issuer: publicOrigin, clockTolerance: 240 }) as any
+    if (!decoded.data?.user_id) {
       logError('wp.posts.post.invalid_token', { requestId })
       return NextResponse.json({ code: 'rest_token_invalid', message: 'Invalid token' }, { status: 401, headers: {
         'Access-Control-Allow-Origin': '*',

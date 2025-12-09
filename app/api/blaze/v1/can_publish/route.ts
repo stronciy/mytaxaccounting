@@ -16,6 +16,16 @@ export async function GET(req: NextRequest) {
     } })
   }
 
+  const userAgent = req.headers.get('user-agent')
+  if (userAgent !== 'Blaze') {
+    logError('blaze.can_publish.forbidden', { requestId, reason: 'Invalid UA' })
+    return NextResponse.json({ error: 'rest_cannot_access', message: 'Forbidden' }, { status: 403, headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET,POST,OPTIONS,HEAD',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-blaze-auth',
+    } })
+  }
+
   const authHeader = req.headers.get('x-blaze-auth')
   if (!authHeader) {
     logError('blaze.can_publish.no_token', { requestId })
@@ -27,11 +37,11 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const decoded = jwt.verify(authHeader, SECRET) as any
     const forwardedHost = req.headers.get('x-forwarded-host')
     const forwardedProto = req.headers.get('x-forwarded-proto') || 'https'
     const publicOrigin = process.env.NEXT_PUBLIC_SITE_URL || (forwardedHost ? `${forwardedProto}://${forwardedHost}` : req.nextUrl.origin)
-    if (decoded.iss !== publicOrigin || !decoded.data?.user_id) {
+    const decoded = jwt.verify(authHeader, SECRET, { algorithms: ['HS256'], issuer: publicOrigin, clockTolerance: 240 }) as any
+    if (!decoded.data?.user_id) {
       logError('blaze.can_publish.invalid_token', { requestId })
       return NextResponse.json({ error: 'Invalid token' }, { status: 401, headers: {
         'Access-Control-Allow-Origin': '*',
