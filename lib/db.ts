@@ -191,7 +191,7 @@ export async function insertPost({ title, content, excerpt = '', slug, status = 
   authorId?: number
   tagsIds?: number[]
   categoriesIds?: number[]
-}) {
+}): Promise<{ id: number; slug: string }> {
   const db = await getDb()
   logInfo('db.posts.insert.start', { slug, status, tagsCount: tagsIds.length, categoriesCount: categoriesIds.length })
   let currentSlug = slug
@@ -206,7 +206,9 @@ export async function insertPost({ title, content, excerpt = '', slug, status = 
       const msg = String(e?.message || e)
       logError('db.posts.insert.error', { slug: currentSlug, error: e })
       if (msg.includes('UNIQUE') && msg.toLowerCase().includes('posts.slug')) {
-        currentSlug = `${slug}-${Math.random().toString(36).slice(2, 6)}`
+        const next = `${slug}-${Math.random().toString(36).slice(2, 6)}`
+        logWarn('db.posts.slug_conflict_retry', { previous: currentSlug, next })
+        currentSlug = next
         continue
       }
       throw e
@@ -232,7 +234,7 @@ export async function insertPost({ title, content, excerpt = '', slug, status = 
 
   await persist(db)
   logInfo('db.posts.insert.done', { id, slug: currentSlug })
-  return id
+  return { id, slug: currentSlug }
 }
 
 export async function getPostsFromDb({ page = 1, perPage = 10, slug }: { page?: number; perPage?: number; slug?: string | null }) {

@@ -218,8 +218,8 @@ export async function POST(req: NextRequest) {
 
         const health = await getStorageHealth()
         logDebug('batch.posts.storage_health', { requestId, health })
-        const id = await insertPost({ title: finalTitle, content: contentHtml, excerpt: excerptText || '', slug: slugText, status, publishedAt, authorId: 1, tagsIds: tagIds, categoriesIds: categoryIds })
-        logInfo('batch.posts.store_prepare', { requestId, id, slug: slugText })
+        const { id, slug: savedSlug } = await insertPost({ title: finalTitle, content: contentHtml, excerpt: excerptText || '', slug: slugText, status, publishedAt, authorId: 1, tagsIds: tagIds, categoriesIds: categoryIds })
+        logInfo('batch.posts.store_prepare', { requestId, id, slug: savedSlug })
         logInfo('batch.posts.store_written', { requestId })
 
         const response = {
@@ -228,12 +228,12 @@ export async function POST(req: NextRequest) {
           title: { rendered: finalTitle },
           content: { rendered: contentHtml },
           excerpt: { rendered: excerptText || '' },
-          slug: slugText,
+          slug: savedSlug,
           status,
-          link: `${req.nextUrl.origin}/blog/${slugText}`,
+          link: `${req.nextUrl.origin}/blog/${savedSlug}`,
         }
 
-        logInfo('batch.posts.created', { requestId, id, slug: slugText })
+        logInfo('batch.posts.created', { requestId, id, slug: savedSlug })
         logInfo('batch.posts.terms_linked', { requestId, tagsCount: tagIds.length, categoriesCount: categoryIds.length, tagIds, categoryIds })
         responses.push({ status: 201, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(response) })
       } catch (error: any) {

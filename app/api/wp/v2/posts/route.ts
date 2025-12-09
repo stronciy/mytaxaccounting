@@ -193,8 +193,8 @@ export async function POST(req: NextRequest) {
     logInfo('wp.posts.post.terms_linked', { requestId, tagsCount: tagIds.length, categoriesCount: categoryIds.length, tagIds, categoryIds })
     const health = await getStorageHealth()
     logDebug('wp.posts.post.storage_health', { requestId, health })
-    const id = await insertPost({ title: finalTitle, content: contentHtml, excerpt: excerpt || '', slug: slugText, status, publishedAt, authorId: 1, tagsIds: tagIds, categoriesIds: categoryIds })
-    logInfo('wp.posts.post.store_prepare', { requestId, id, slug: slugText })
+    const { id, slug: savedSlug } = await insertPost({ title: finalTitle, content: contentHtml, excerpt: excerpt || '', slug: slugText, status, publishedAt, authorId: 1, tagsIds: tagIds, categoriesIds: categoryIds })
+    logInfo('wp.posts.post.store_prepare', { requestId, id, slug: savedSlug })
     logInfo('wp.posts.post.store_written', { requestId })
 
     const response = {
@@ -203,12 +203,12 @@ export async function POST(req: NextRequest) {
       title: { rendered: finalTitle },
       content: { rendered: contentHtml },
       excerpt: { rendered: excerpt || '' },
-      slug: slugText,
+      slug: savedSlug,
       status,
-      link: `${req.nextUrl.origin}/blog/${slugText}`,
+      link: `${req.nextUrl.origin}/blog/${savedSlug}`,
     }
 
-    logInfo('wp.posts.post.created', { requestId, id, slug: slugText })
+    logInfo('wp.posts.post.created', { requestId, id, slug: savedSlug })
     return NextResponse.json(response, { status: 201, headers: {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': 'GET,POST,OPTIONS,HEAD',
