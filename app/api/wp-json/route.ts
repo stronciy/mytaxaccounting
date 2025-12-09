@@ -13,8 +13,14 @@ export async function GET(req: NextRequest) {
     description: 'Site Description',
     url: origin,
     home: origin,
-    namespaces: ['blaze/v1'],
+    namespaces: ['blaze/v1', 'wp/v2', 'batch/v1'],
     routes: {
+      '/': {
+        namespace: '',
+        methods: ['GET'],
+        endpoints: [{ methods: ['GET'] }],
+        _links: { self: [{ href: `${origin}/wp-json/` }] },
+      },
       '/blaze/v1': {
         namespace: 'blaze/v1',
         methods: ['GET'],
@@ -24,7 +30,13 @@ export async function GET(req: NextRequest) {
       '/blaze/v1/token': {
         namespace: 'blaze/v1',
         methods: ['POST'],
-        endpoints: [{ methods: ['POST'] }],
+        endpoints: [{
+          methods: ['POST'],
+          args: {
+            username: { required: true, type: 'string' },
+            password: { required: true, type: 'string' },
+          }
+        }],
         _links: { self: [{ href: `${origin}/wp-json/blaze/v1/token` }] },
       },
       '/blaze/v1/can_publish': {
@@ -32,6 +44,39 @@ export async function GET(req: NextRequest) {
         methods: ['GET'],
         endpoints: [{ methods: ['GET'] }],
         _links: { self: [{ href: `${origin}/wp-json/blaze/v1/can_publish` }] },
+      },
+      '/wp/v2/posts': {
+        namespace: 'wp/v2',
+        methods: ['GET', 'POST'],
+        endpoints: [
+          { methods: ['GET'] },
+          { methods: ['POST'] }
+        ],
+        _links: { self: [{ href: `${origin}/wp-json/wp/v2/posts` }] },
+      },
+      '/wp/v2/tags': {
+        namespace: 'wp/v2',
+        methods: ['GET', 'POST'],
+        endpoints: [
+          { methods: ['GET'] },
+          { methods: ['POST'] }
+        ],
+        _links: { self: [{ href: `${origin}/wp-json/wp/v2/tags` }] },
+      },
+      '/wp/v2/categories': {
+        namespace: 'wp/v2',
+        methods: ['GET', 'POST'],
+        endpoints: [
+          { methods: ['GET'] },
+          { methods: ['POST'] }
+        ],
+        _links: { self: [{ href: `${origin}/wp-json/wp/v2/categories` }] },
+      },
+      '/batch/v1': {
+        namespace: 'batch/v1',
+        methods: ['POST'],
+        endpoints: [{ methods: ['POST'] }],
+        _links: { self: [{ href: `${origin}/wp-json/batch/v1` }] },
       },
     },
     authentication: {},
