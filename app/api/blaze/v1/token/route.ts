@@ -18,11 +18,39 @@ export async function POST(req: NextRequest) {
     } })
   }
 
-  const { username, password } = await req.json()
+  let username: string | undefined
+  let password: string | undefined
+  const ct = req.headers.get('content-type') || ''
+  if (ct.includes('application/json')) {
+    const body = await req.json()
+    username = body?.username
+    password = body?.password
+  } else if (ct.includes('application/x-www-form-urlencoded')) {
+    const text = await req.text()
+    const params = new URLSearchParams(text)
+    username = params.get('username') || undefined
+    password = params.get('password') || undefined
+  } else {
+    const body = await req.json().catch(() => ({} as any))
+    username = body?.username
+    password = body?.password
+  }
 
-  if (username !== USERNAME || password !== PASSWORD) {
-    logError('blaze.token.invalid_credentials', { requestId, username })
-    return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 })
+  if (username !== USERNAME) {
+    logError('blaze.token.invalid_username', { requestId, username })
+    return NextResponse.json({ code: 'invalid_username', message: 'Unknown username. Check again or try your email address.', data: { status: 401 } }, { status: 401, headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET,POST,OPTIONS,HEAD',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-blaze-auth',
+    } })
+  }
+  if (password !== PASSWORD) {
+    logError('blaze.token.incorrect_password', { requestId, username })
+    return NextResponse.json({ code: 'incorrect_password', message: `The password you entered for the username ${String(username)} is incorrect.`, data: { status: 401 } }, { status: 401, headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET,POST,OPTIONS,HEAD',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-blaze-auth',
+    } })
   }
 
   const now = Math.floor(Date.now() / 1000)

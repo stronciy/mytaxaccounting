@@ -83,14 +83,39 @@ export async function POST(req: NextRequest) {
     const publicOrigin = process.env.NEXT_PUBLIC_SITE_URL || (forwardedHost ? `${forwardedProto}://${forwardedHost}` : req.nextUrl.origin)
     const decoded = jwt.verify(authHeader, SECRET, { algorithms: ['HS256'], issuer: publicOrigin, clockTolerance: 240 }) as any
     if (!decoded.data?.user_id) {
-      logError('wp.posts.post.invalid_token', { requestId })
-      return NextResponse.json({ code: 'rest_token_invalid', message: 'Invalid token' }, { status: 401, headers: {
+      logError('wp.posts.post.bad_request', { requestId })
+      return NextResponse.json({ code: 'bad_request', message: 'Incomplete data', data: { status: 401 } }, { status: 401, headers: {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'GET,POST,OPTIONS,HEAD',
         'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-blaze-auth',
       } })
     }
-  } catch {
+  } catch (e: any) {
+    const msg = String(e?.message || '')
+    if (msg.includes('jwt issuer invalid')) {
+      logError('wp.posts.post.bad_issuer', { requestId })
+      return NextResponse.json({ code: 'bad_issuer', message: 'The issuer does not match with this server', data: { status: 401 } }, { status: 401, headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET,POST,OPTIONS,HEAD',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-blaze-auth',
+      } })
+    }
+    if (e?.name === 'TokenExpiredError') {
+      logError('wp.posts.post.invalid_token_expired', { requestId })
+      return NextResponse.json({ code: 'invalid_token', message: 'Expired token', data: { status: 403 } }, { status: 403, headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET,POST,OPTIONS,HEAD',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-blaze-auth',
+      } })
+    }
+    if (msg.includes('invalid signature')) {
+      logError('wp.posts.post.invalid_token_signature', { requestId })
+      return NextResponse.json({ code: 'invalid_token', message: 'Signature verification failed', data: { status: 403 } }, { status: 403, headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET,POST,OPTIONS,HEAD',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-blaze-auth',
+      } })
+    }
     logError('wp.posts.post.verify_failed', { requestId })
     return NextResponse.json({ code: 'rest_token_invalid', message: 'Invalid token' }, { status: 401, headers: {
       'Access-Control-Allow-Origin': '*',

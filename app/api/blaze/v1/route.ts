@@ -9,32 +9,11 @@ function getOrigin(req: NextRequest) {
 export async function GET(req: NextRequest) {
   const origin = getOrigin(req)
   const body = {
-    name: 'My Tax Accounting',
-    description: 'Site Description',
-    url: origin,
-    home: origin,
-    namespaces: ['blaze/v1'],
+    namespace: 'blaze/v1',
     routes: {
-      '/blaze/v1': {
-        namespace: 'blaze/v1',
-        methods: ['GET'],
-        endpoints: [{ methods: ['GET'] }],
-        _links: { self: [{ href: `${origin}/wp-json/blaze/v1` }] },
-      },
-      '/blaze/v1/token': {
-        namespace: 'blaze/v1',
-        methods: ['POST'],
-        endpoints: [{ methods: ['POST'] }],
-        _links: { self: [{ href: `${origin}/wp-json/blaze/v1/token` }] },
-      },
-      '/blaze/v1/can_publish': {
-        namespace: 'blaze/v1',
-        methods: ['GET'],
-        endpoints: [{ methods: ['GET'] }],
-        _links: { self: [{ href: `${origin}/wp-json/blaze/v1/can_publish` }] },
-      },
+      token: { href: `${origin}/wp-json/blaze/v1/token`, methods: ['POST'] },
+      can_publish: { href: `${origin}/wp-json/blaze/v1/can_publish`, methods: ['GET'] },
     },
-    authentication: {},
   }
   return NextResponse.json(body, {
     headers: {
