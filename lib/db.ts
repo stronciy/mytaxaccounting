@@ -22,8 +22,13 @@ async function ensureDir() {
 
 async function persist(db: Database) {
   await ensureDir()
-  const data = db.export()
-  await fs.writeFile(DB_PATH, Buffer.from(data))
+  try {
+    const data = db.export()
+    await fs.writeFile(DB_PATH, Buffer.from(data))
+  } catch (e: any) {
+    logError('db.persist.error', { error: String(e?.message || e) })
+    throw e
+  }
 }
 
 export async function getDb() {

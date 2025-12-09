@@ -1,4 +1,9 @@
-import { randomUUID } from 'crypto'
+function makeId() {
+  const g: any = globalThis as any
+  if (g?.crypto && typeof g.crypto.randomUUID === 'function') return g.crypto.randomUUID()
+  const rnd = Math.random().toString(36).slice(2)
+  return `req_${Date.now()}_${rnd}`
+}
 
 function redactHeaders(headers: Headers) {
   const out: Record<string, string> = {}
@@ -14,7 +19,7 @@ function redactHeaders(headers: Headers) {
 }
 
 export function makeRequestId() {
-  return randomUUID()
+  return makeId()
 }
 
 export function logInfo(event: string, data: Record<string, any>) {
