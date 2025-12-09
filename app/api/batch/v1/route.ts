@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import jwt from 'jsonwebtoken'
 import { promises as fs } from 'fs'
 import path from 'path'
-import { upsertTag, upsertCategory, insertPost } from '@/lib/db'
-import { logInfo, logError, makeRequestId, sanitizeRequest } from '@/lib/logger'
+import { upsertTag, upsertCategory, insertPost, getStorageHealth } from '@/lib/db'
+import { logInfo, logError, makeRequestId, sanitizeRequest, logDebug } from '@/lib/logger'
 
 const SECRET = process.env.BLAZE_SECRET as string
 const STORE_PATH = path.join(process.cwd(), 'data', 'blog-local.json')
@@ -216,6 +216,8 @@ export async function POST(req: NextRequest) {
           categoriesCount: Array.isArray(categories) ? categories.length : 0,
         })
 
+        const health = await getStorageHealth()
+        logDebug('batch.posts.storage_health', { requestId, health })
         const id = await insertPost({ title: finalTitle, content: contentHtml, excerpt: excerptText || '', slug: slugText, status, publishedAt, authorId: 1, tagsIds: tagIds, categoriesIds: categoryIds })
         logInfo('batch.posts.store_prepare', { requestId, id, slug: slugText })
         logInfo('batch.posts.store_written', { requestId })
@@ -235,7 +237,7 @@ export async function POST(req: NextRequest) {
         logInfo('batch.posts.terms_linked', { requestId, tagsCount: tagIds.length, categoriesCount: categoryIds.length, tagIds, categoryIds })
         responses.push({ status: 201, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(response) })
       } catch (error: any) {
-        logError('batch.posts.error', { requestId, error: String(error) })
+        logError('batch.posts.error', { requestId, error })
         responses.push({ status: 500, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: 'rest_cannot_create', message: 'Error creating post' }) })
       }
       continue

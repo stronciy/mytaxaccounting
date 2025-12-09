@@ -1,5 +1,5 @@
 import initSqlJs, { Database, Statement } from 'sql.js'
-import { logInfo, logError } from '@/lib/logger'
+import { logInfo, logError, logDebug, logWarn } from '@/lib/logger'
 import { promises as fs } from 'fs'
 import path from 'path'
 
@@ -20,14 +20,71 @@ async function ensureDir() {
   await fs.mkdir(path.dirname(DB_PATH), { recursive: true })
 }
 
+async function pathExists(p: string) {
+  try {
+    await fs.stat(p)
+    return true
+  } catch {
+    return false
+  }
+}
+
+export async function getStorageHealth() {
+  const dir = path.dirname(DB_PATH)
+  const dirExists = await pathExists(dir)
+  let canWriteDir = false
+  try {
+    await fs.access(dir, (fs as any).constants.W_OK)
+    canWriteDir = true
+  } catch {
+    canWriteDir = false
+  }
+  const fileExists = await pathExists(DB_PATH)
+  let canWriteFile = false
+  try {
+    if (fileExists) await fs.access(DB_PATH, (fs as any).constants.W_OK)
+    canWriteFile = fileExists ? true : canWriteDir
+  } catch {
+    canWriteFile = false
+  }
+  const tmpPath = path.join(dir, '.healthcheck.tmp')
+  let tempWriteOk = false
+  let tempWriteError: string | undefined
+  try {
+    await fs.writeFile(tmpPath, Buffer.from('ok'), { flag: 'w' })
+    tempWriteOk = true
+  } catch (e: any) {
+    tempWriteError = String(e?.message || e)
+  } finally {
+    try { await fs.unlink(tmpPath) } catch {}
+  }
+  const snapshot = { dir, dirExists, canWriteDir, file: DB_PATH, fileExists, canWriteFile, tempWriteOk, tempWriteError }
+  logInfo('db.storage.health', snapshot)
+  return snapshot
+}
+
 async function persist(db: Database) {
   await ensureDir()
-  try {
-    const data = db.export()
-    await fs.writeFile(DB_PATH, Buffer.from(data))
-  } catch (e: any) {
-    logError('db.persist.error', { error: String(e?.message || e) })
-    throw e
+  await getStorageHealth()
+  const data = db.export()
+  const buf = Buffer.from(data)
+  const MAX = 3
+  let attempt = 0
+  while (true) {
+    try {
+      await fs.writeFile(DB_PATH, buf)
+      if (attempt > 0) logInfo('db.persist.retry_success', { attempts: attempt })
+      break
+    } catch (e: any) {
+      const code = e?.code
+      logError('db.persist.error', { error: e, code, attempt })
+      if (attempt >= MAX) throw e
+      const delay = Math.pow(3, attempt) * 100
+      logWarn('db.persist.retry', { attempt: attempt + 1, delay })
+      await new Promise((r) => setTimeout(r, delay))
+      attempt++
+      continue
+    }
   }
 }
 
@@ -147,7 +204,7 @@ export async function insertPost({ title, content, excerpt = '', slug, status = 
       inserted = true
     } catch (e: any) {
       const msg = String(e?.message || e)
-      logError('db.posts.insert.error', { slug: currentSlug, error: msg })
+      logError('db.posts.insert.error', { slug: currentSlug, error: e })
       if (msg.includes('UNIQUE') && msg.toLowerCase().includes('posts.slug')) {
         currentSlug = `${slug}-${Math.random().toString(36).slice(2, 6)}`
         continue

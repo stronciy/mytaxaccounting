@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import jwt from 'jsonwebtoken'
 import { promises as fs } from 'fs'
 import path from 'path'
-import { insertPost, getPostsFromDb, upsertTag, upsertCategory } from '@/lib/db'
-import { logInfo, logError, makeRequestId, sanitizeRequest } from '@/lib/logger'
+import { insertPost, getPostsFromDb, upsertTag, upsertCategory, getStorageHealth } from '@/lib/db'
+import { logInfo, logError, makeRequestId, sanitizeRequest, logDebug } from '@/lib/logger'
 
 const SECRET = process.env.BLAZE_SECRET as string
 const STORE_PATH = path.join(process.cwd(), 'data', 'blog-local.json')
@@ -191,6 +191,8 @@ export async function POST(req: NextRequest) {
       categoryIds = resolved
     }
     logInfo('wp.posts.post.terms_linked', { requestId, tagsCount: tagIds.length, categoriesCount: categoryIds.length, tagIds, categoryIds })
+    const health = await getStorageHealth()
+    logDebug('wp.posts.post.storage_health', { requestId, health })
     const id = await insertPost({ title: finalTitle, content: contentHtml, excerpt: excerpt || '', slug: slugText, status, publishedAt, authorId: 1, tagsIds: tagIds, categoriesIds: categoryIds })
     logInfo('wp.posts.post.store_prepare', { requestId, id, slug: slugText })
     logInfo('wp.posts.post.store_written', { requestId })
@@ -213,7 +215,7 @@ export async function POST(req: NextRequest) {
       'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-blaze-auth',
     } })
   } catch (error) {
-    logError('wp.posts.post.error', { requestId, error: String(error) })
+    logError('wp.posts.post.error', { requestId, error })
     return NextResponse.json({ code: 'rest_cannot_create', message: 'Error creating post' }, { status: 500, headers: {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': 'GET,POST,OPTIONS,HEAD',
