@@ -90,6 +90,7 @@ export async function POST(req: NextRequest) {
         'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-blaze-auth',
       } })
     }
+    logInfo('wp.posts.post.token_ok', { requestId, userId: decoded.data.user_id })
   } catch (e: any) {
     const msg = String(e?.message || '')
     if (msg.includes('jwt issuer invalid')) {
@@ -136,6 +137,16 @@ export async function POST(req: NextRequest) {
       .replace(/\s+/g, '-')
       .replace(/[^a-z0-9-]/g, '')
 
+    logInfo('wp.posts.post.body_parsed', {
+      requestId,
+      title: String(titleText || ''),
+      slug: slugText,
+      status,
+      contentLen: typeof contentHtml === 'string' ? contentHtml.length : 0,
+      excerptLen: typeof (excerpt || '') === 'string' ? (excerpt || '').length : 0,
+      categoriesCount: Array.isArray(categories) ? categories.length : 0,
+    })
+
     const posts = await readStore()
     const id = posts.length ? Math.max(...posts.map((p) => p.id)) + 1 : 1
     const newPost = {
@@ -149,8 +160,11 @@ export async function POST(req: NextRequest) {
       categories,
       authorId: 1,
     }
+    logInfo('wp.posts.post.store_prepare', { requestId, id, slug: slugText })
     posts.unshift(newPost)
     await writeStore(posts)
+
+    logInfo('wp.posts.post.store_written', { requestId, total: posts.length })
 
     const response = {
       id,
