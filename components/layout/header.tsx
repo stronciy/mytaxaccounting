@@ -76,7 +76,7 @@ export function Header({ transparent = false }: HeaderProps) {
               {mainNav.map((item) => {
                 const isAnchor = item.href.startsWith("/#")
                 const id = isAnchor ? item.href.split("#")[1] : ""
-                const isActive = isAnchor && activeSection === id
+                const isActive = isAnchor ? activeSection === id : pathname === item.href
                 return (
                   <Link
                     key={item.href}

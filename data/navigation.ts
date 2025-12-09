@@ -12,6 +12,7 @@ export const mainNav: NavItem[] = [
   { label: "Services", href: "/#services" },
   { label: "Fixed Fee Packages", href: "/#packages" },
   { label: "Add-ons", href: "/#advisory" },
+  { label: "Blog", href: "/blog" },
   { label: "FAQ", href: "/#faq" },
   { label: "Contact", href: "/contact" },
 ]
@@ -28,6 +29,7 @@ export const footerNav: Record<string, FooterNavSection> = {
   company: {
     title: "Company",
     links: [
+      { label: "Blog", href: "/blog" },
       { label: "Contact", href: "/contact" },
     ],
   },
