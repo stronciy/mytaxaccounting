@@ -1,0 +1,41 @@
+[
+  {
+    "id": 3,
+    "title": "Тестовая публикация",
+    "content": "<p>Контент от Blaze</p>",
+    "excerpt": "Короткое описание",
+    "slug": "testovaya-publikacya",
+    "status": "publish",
+    "publishedAt": "2025-12-09T10:50:24.388Z",
+    "categories": [
+      "Новости"
+    ],
+    "authorId": 1
+  },
+  {
+    "id": 2,
+    "title": "Тестовая публикация",
+    "content": "<p>Контент от Blaze</p>",
+    "excerpt": "Короткое описание",
+    "slug": "testovaya-publikacya",
+    "status": "publish",
+    "publishedAt": "2025-12-09T10:48:36.162Z",
+    "categories": [
+      "Новости"
+    ],
+    "authorId": 1
+  },
+  {
+    "id": 1,
+    "title": "Тестовая публикация",
+    "content": "<p>Контент от Blaze</p>",
+    "excerpt": "Короткое описание",
+    "slug": "testovaya-publikacya",
+    "status": "publish",
+    "publishedAt": "2025-12-09T10:45:28.936Z",
+    "categories": [
+      "Новости"
+    ],
+    "authorId": 1
+  }
+]
