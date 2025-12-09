@@ -237,6 +237,56 @@ export async function insertPost({ title, content, excerpt = '', slug, status = 
   return { id, slug: currentSlug }
 }
 
+export async function upsertPostBySlug({ title, content, excerpt = '', slug, status = 'publish', publishedAt, authorId = 1, tagsIds = [], categoriesIds = [] }: {
+  title: string
+  content: string
+  excerpt?: string
+  slug: string
+  status?: string
+  publishedAt: string
+  authorId?: number
+  tagsIds?: number[]
+  categoriesIds?: number[]
+}): Promise<{ id: number; slug: string }> {
+  const db = await getDb()
+  logInfo('db.posts.upsert.start', { slug, status, tagsCount: tagsIds.length, categoriesCount: categoriesIds.length })
+  const sel = db.prepare('SELECT id FROM posts WHERE slug = ?')
+  sel.bind([slug])
+  const exists = sel.step() ? (sel.getAsObject().id as number) : null
+  sel.free()
+  let id = 0
+  if (exists) {
+    const upd = db.prepare('UPDATE posts SET title = ?, content = ?, excerpt = ?, status = ?, published_at = ?, author_id = ? WHERE slug = ?')
+    upd.run([title, content, excerpt, status, publishedAt, authorId, slug])
+    upd.free()
+    id = exists
+    if (Array.isArray(tagsIds)) {
+      const delT = db.prepare('DELETE FROM post_tags WHERE post_id = ?')
+      delT.run([id])
+      delT.free()
+      const tStmt = db.prepare('INSERT OR IGNORE INTO post_tags(post_id, tag_id) VALUES(?, ?)')
+      for (const tid of tagsIds) tStmt.run([id, tid])
+      tStmt.free()
+      logInfo('db.posts.link.tags', { postId: id, tagsIds })
+    }
+    if (Array.isArray(categoriesIds)) {
+      const delC = db.prepare('DELETE FROM post_categories WHERE post_id = ?')
+      delC.run([id])
+      delC.free()
+      const cStmt = db.prepare('INSERT OR IGNORE INTO post_categories(post_id, category_id) VALUES(?, ?)')
+      for (const cid of categoriesIds) cStmt.run([id, cid])
+      cStmt.free()
+      logInfo('db.posts.link.categories', { postId: id, categoriesIds })
+    }
+    await persist(db)
+    logInfo('db.posts.upsert.update_done', { id, slug })
+    return { id, slug }
+  }
+  const inserted = await insertPost({ title, content, excerpt, slug, status, publishedAt, authorId, tagsIds, categoriesIds })
+  logInfo('db.posts.upsert.insert_done', { id: inserted.id, slug: inserted.slug })
+  return inserted
+}
+
 export async function getPostsFromDb({ page = 1, perPage = 10, slug }: { page?: number; perPage?: number; slug?: string | null }) {
   const db = await getDb()
   const offset = (page - 1) * perPage

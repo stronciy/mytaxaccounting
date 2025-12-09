@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import jwt from 'jsonwebtoken'
 import { promises as fs } from 'fs'
 import path from 'path'
-import { insertPost, getPostsFromDb, upsertTag, upsertCategory, getStorageHealth } from '@/lib/db'
+import { upsertPostBySlug, getPostsFromDb, upsertTag, upsertCategory, getStorageHealth } from '@/lib/db'
 import { logInfo, logError, makeRequestId, sanitizeRequest, logDebug } from '@/lib/logger'
 
 const SECRET = process.env.BLAZE_SECRET as string
@@ -193,7 +193,7 @@ export async function POST(req: NextRequest) {
     logInfo('wp.posts.post.terms_linked', { requestId, tagsCount: tagIds.length, categoriesCount: categoryIds.length, tagIds, categoryIds })
     const health = await getStorageHealth()
     logDebug('wp.posts.post.storage_health', { requestId, health })
-    const { id, slug: savedSlug } = await insertPost({ title: finalTitle, content: contentHtml, excerpt: excerpt || '', slug: slugText, status, publishedAt, authorId: 1, tagsIds: tagIds, categoriesIds: categoryIds })
+    const { id, slug: savedSlug } = await upsertPostBySlug({ title: finalTitle, content: contentHtml, excerpt: excerpt || '', slug: slugText, status, publishedAt, authorId: 1, tagsIds: tagIds, categoriesIds: categoryIds })
     logInfo('wp.posts.post.store_prepare', { requestId, id, slug: savedSlug })
     logInfo('wp.posts.post.store_written', { requestId })
 

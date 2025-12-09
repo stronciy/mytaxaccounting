@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import jwt from 'jsonwebtoken'
 import { promises as fs } from 'fs'
 import path from 'path'
-import { upsertTag, upsertCategory, insertPost, getStorageHealth } from '@/lib/db'
+import { upsertTag, upsertCategory, upsertPostBySlug, getStorageHealth } from '@/lib/db'
 import { logInfo, logError, makeRequestId, sanitizeRequest, logDebug } from '@/lib/logger'
 
 const SECRET = process.env.BLAZE_SECRET as string
@@ -218,7 +218,7 @@ export async function POST(req: NextRequest) {
 
         const health = await getStorageHealth()
         logDebug('batch.posts.storage_health', { requestId, health })
-        const { id, slug: savedSlug } = await insertPost({ title: finalTitle, content: contentHtml, excerpt: excerptText || '', slug: slugText, status, publishedAt, authorId: 1, tagsIds: tagIds, categoriesIds: categoryIds })
+        const { id, slug: savedSlug } = await upsertPostBySlug({ title: finalTitle, content: contentHtml, excerpt: excerptText || '', slug: slugText, status, publishedAt, authorId: 1, tagsIds: tagIds, categoriesIds: categoryIds })
         logInfo('batch.posts.store_prepare', { requestId, id, slug: savedSlug })
         logInfo('batch.posts.store_written', { requestId })
 

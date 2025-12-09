@@ -54,7 +54,8 @@ export function Header({ transparent = false }: HeaderProps) {
     return () => observer.disconnect()
   }, [])
 
-  const showBackground = isScrolled || !transparent
+  const forceSolid = pathname?.startsWith('/blog')
+  const showBackground = isScrolled || !transparent || forceSolid
 
   return (
     <>
