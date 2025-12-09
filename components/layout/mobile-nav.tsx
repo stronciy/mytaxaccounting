@@ -103,11 +103,11 @@ export function MobileNav({ isOpen, onClose }: MobileNavProps) {
           {/* CTA */}
           <div className="border-t border-slate-800 px-6 py-8">
             <Link
-              href="tel:0800742915"
+              href="tel:+64272423432"
               className="block w-full py-3 text-center bg-[#d4a853] hover:bg-[#e4be6a] text-[#0a0f1a] font-semibold transition-colors"
               onClick={onClose}
             >
-              0800 742 915
+              +64 27 242 3432
             </Link>
           </div>
         </div>

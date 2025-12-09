@@ -104,10 +104,10 @@ export function Header({ transparent = false }: HeaderProps) {
             {/* Desktop CTA */}
             <div className="hidden lg:flex lg:items-center lg:gap-4">
               <Link
-                href="tel:0800742915"
+                href="tel:+64272423432"
                 className="btn-glow inline-flex items-center justify-center bg-[#d4a853] hover:bg-[#e4be6a] text-[#0a0f1a] px-5 py-2.5 text-sm font-semibold transition-all duration-300"
               >
-                0800 742 915
+                +64 27 242 3432
               </Link>
             </div>
 
