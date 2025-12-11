@@ -100,7 +100,7 @@ export default function FAQPage() {
                 </Button>
               </Link>
               <Link href="/pricing">
-                <Button variant="outline" size="lg">See Fixed Fee Packages</Button>
+                <Button variant="outline" size="lg">See Price List</Button>
               </Link>
             </div>
           </div>

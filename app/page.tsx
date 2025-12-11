@@ -381,10 +381,10 @@ export default function HomePage() {
                 </svg>
               </Link>
               <Link
-                href="/#packages"
+                href="/#price-by-type"
                 className="inline-flex items-center justify-center gap-2 border border-[#006400] text-[#006400] hover:bg-[#006400]/10 px-8 py-4 text-lg font-medium rounded-none transition-all duration-300"
               >
-                See Fixed Fee Packages
+                See Price List
               </Link>
             </div>
 
@@ -477,10 +477,10 @@ export default function HomePage() {
 
           <div className="text-center">
             <Link
-              href="/#packages"
+              href="/#price-by-type"
               className="inline-flex items-center gap-2 bg-[#d4a853] hover:bg-[#e4be6a] text-[#0f172a] px-8 py-4 text-lg font-semibold transition-all duration-300"
             >
-              See Fixed Fee Packages
+              See Price List
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
               </svg>
@@ -856,10 +856,10 @@ export default function HomePage() {
                 </svg>
               </Link>
               <Link
-                href="/#packages"
+                href="/#price-by-type"
                 className="inline-flex items-center justify-center gap-2 border border-slate-600 hover:border-white text-white px-10 py-5 text-lg font-medium transition-all duration-300"
               >
-                See Fixed Fee Packages
+                 See Price List
               </Link>
             </div>
 

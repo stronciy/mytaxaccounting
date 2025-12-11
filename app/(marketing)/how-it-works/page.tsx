@@ -73,7 +73,7 @@ export default function HowItWorksPage() {
             <h2 className='text-3xl font-bold text-white mb-4'>Experience the My Tax Accounting Difference</h2>
             <p className='text-xl text-gray-300 mb-8'>On‑time GST, payroll, and annual returns with fixed monthly fees.</p>
             <div className='flex flex-col sm:flex-row gap-4 justify-center'>
-              <Link href='/#packages'><Button variant='accent' size='lg'>See Packages</Button></Link>
+              <Link href='/#price-by-type'><Button variant='accent' size='lg'>See Price List</Button></Link>
               <Link href='/contact'><Button variant='outline' size='lg' className='border-white text-white hover:bg-white hover:text-gray-900'>Talk to an Expert</Button></Link>
             </div>
           </div>

@@ -97,7 +97,7 @@ export default function HomePage() {
             <p className="text-xl text-gray-300 mb-8">On‑time GST, payroll, and annual returns with fixed monthly fees.</p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/contact"><Button variant="accent" size="lg">Get Accounting Support</Button></Link>
-              <Link href="/#packages"><Button variant="outline" size="lg" className="border-white text-white hover:bg-white hover:text-gray-900">See Packages</Button></Link>
+              <Link href="/#price-by-type"><Button variant="outline" size="lg" className="border-white text-white hover:bg-white hover:text-gray-900">See Price List</Button></Link>
             </div>
           </div>
         </Container>
