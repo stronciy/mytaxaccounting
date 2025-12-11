@@ -333,11 +333,7 @@ export default function HomePage() {
       {/* ============================================
           HERO SECTION - Clean White with Green Accents
           ============================================ */}
-      <section
-        className="relative min-h-screen flex items-center bg-cover bg-center"
-        style={{ backgroundImage: "url('/images/office-light.jpg')" }}
-      >
-        <div className="absolute inset-0 bg-white/70" />
+      <section className="relative min-h-screen bg-white flex items-center">
 
         <div className="container-xl relative z-10 py-32 lg:py-40">
           <div className="max-w-5xl mx-auto text-center">
@@ -345,8 +341,9 @@ export default function HomePage() {
             <div
               className={`inline-flex items-center justify-center gap-3 mb-8 opacity-0 ${isLoaded ? 'animate-fade-in-up' : ''}`}
             >
-              <span className="text-mono text-[#d4a853] tracking-widest">Accounting as a Service</span>
-              <span className="w-12 h-px bg-gradient-to-r from-[#d4a853] to-transparent" />
+              <span className="inline-block px-4 py-1 bg-[#d4a853] text-[#0f172a] font-semibold tracking-widest">
+                Accounting as a Service
+              </span>
             </div>
 
             {/* Main Headline */}
