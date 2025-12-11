@@ -39,7 +39,7 @@ export function MobileNav({ isOpen, onClose }: MobileNavProps) {
       {/* Drawer */}
       <div
         className={cn(
-          "fixed top-0 right-0 z-50 h-full w-full max-w-sm bg-[#0f172a] shadow-xl transition-transform duration-300 ease-in-out lg:hidden",
+          "fixed top-0 right-0 z-50 h-full w-full max-w-sm bg-[#006400] shadow-xl transition-transform duration-300 ease-in-out lg:hidden",
           isOpen ? "translate-x-0" : "translate-x-full"
         )}
       >
@@ -71,12 +71,12 @@ export function MobileNav({ isOpen, onClose }: MobileNavProps) {
 
           {/* Navigation Links */}
           <nav className="flex-1 overflow-y-auto px-6 py-8">
-            <ul className="space-y-2">
+            <ul className="space-y-3">
               {mainNav.map((item, index) => (
                 <li key={item.href}>
                   <Link
                     href={item.href}
-                    className="group flex items-center gap-4 py-4 border-b border-slate-800 text-lg font-medium text-white hover:text-[#d4a853] transition-colors"
+                    className="group relative flex items-center gap-4 py-3 text-lg font-semibold text-white transition-colors"
                     onClick={(e) => {
                       const isAnchor = item.href.startsWith("/#")
                       if (isAnchor && window.location.pathname === "/") {
@@ -90,10 +90,11 @@ export function MobileNav({ isOpen, onClose }: MobileNavProps) {
                       }
                     }}
                   >
-                    <span className="text-mono text-[#d4a853] text-xs">
+                    <span className="text-mono text-white/80 text-xs">
                       0{index + 1}
                     </span>
                     {item.label}
+                    <span className="absolute bottom-0 left-0 h-px w-0 bg-[#d4a853] transition-all duration-300 ease-in-out group-hover:w-full" />
                   </Link>
                 </li>
               ))}

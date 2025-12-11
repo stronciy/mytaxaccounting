@@ -56,24 +56,23 @@ export function Header({ transparent = false }: HeaderProps) {
 
   const forceSolid = pathname?.startsWith('/blog')
   const showBackground = isScrolled || !transparent || forceSolid
+  const isHome = pathname === '/'
 
   return (
     <>
       <header
         className={cn(
           "fixed top-0 left-0 right-0 z-50 transition-all duration-500",
-          showBackground
-            ? "bg-[#0f172a]/95 backdrop-blur-md shadow-lg shadow-black/5"
-            : "bg-transparent"
+          "bg-[#006400] shadow-lg shadow-black/5"
         )}
       >
         <div className="container-xl">
           <div className="flex h-16 items-center justify-between lg:h-20">
             {/* Logo */}
-            <Logo variant="light" />
+            <Logo variant={isHome && !showBackground ? "dark" : "light"} />
 
             {/* Desktop Navigation */}
-            <nav className="hidden lg:flex lg:items-center lg:gap-8">
+            <nav className="hidden lg:flex lg:items-center lg:gap-6">
               {mainNav.map((item) => {
                 const isAnchor = item.href.startsWith("/#")
                 const id = isAnchor ? item.href.split("#")[1] : ""
@@ -90,9 +89,8 @@ export function Header({ transparent = false }: HeaderProps) {
                       }
                     }}
                     className={cn(
-                      "relative text-sm font-medium transition-colors",
-                      isActive ? "text-white" : "text-slate-300 hover:text-white",
-                      "after:absolute after:bottom-0 after:left-0 after:h-px after:w-0 after:bg-[#d4a853] after:transition-all after:duration-300",
+                      "relative text-sm font-semibold text-white transition-colors",
+                      "after:absolute after:bottom-0 after:left-0 after:h-px after:w-0 after:bg-[#d4a853] after:transition-all after:duration-300 after:ease-in-out",
                       isActive ? "after:w-full" : "hover:after:w-full"
                     )}
                   >
@@ -120,7 +118,7 @@ export function Header({ transparent = false }: HeaderProps) {
               aria-label="Open menu"
             >
               <svg
-                className="h-6 w-6 text-white"
+                className={cn("h-6 w-6 text-white")}
                 fill="none"
                 viewBox="0 0 24 24"
                 strokeWidth={1.5}

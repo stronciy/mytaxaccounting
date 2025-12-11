@@ -2,16 +2,21 @@
 
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
+import { cn } from '@/lib/utils'
 
 // Animated Counter Component
-function AnimatedCounter({ end, duration = 2000, suffix = '', prefix = '' }: {
+function AnimatedCounter({ end, duration = 1200, suffix = '', prefix = '', decimals = 0, flickerMs = 400, className = '' }: {
   end: number
   duration?: number
   suffix?: string
   prefix?: string
+  decimals?: number
+  flickerMs?: number
+  className?: string
 }) {
   const [count, setCount] = useState(0)
   const [isVisible, setIsVisible] = useState(false)
+  const [flickerDone, setFlickerDone] = useState(false)
   const ref = useRef<HTMLSpanElement>(null)
 
   useEffect(() => {
@@ -24,28 +29,247 @@ function AnimatedCounter({ end, duration = 2000, suffix = '', prefix = '' }: {
       },
       { threshold: 0.3 }
     )
-
     if (ref.current) observer.observe(ref.current)
     return () => observer.disconnect()
   }, [])
 
   useEffect(() => {
     if (!isVisible) return
-
+    let flickerTimer: any
+    let elapsed = 0
+    if (!flickerDone && flickerMs > 0) {
+      flickerTimer = setInterval(() => {
+        elapsed += 50
+        const rnd = Math.random() * end
+        setCount(rnd)
+        if (elapsed >= flickerMs) {
+          clearInterval(flickerTimer)
+          setFlickerDone(true)
+        }
+      }, 50)
+      return () => clearInterval(flickerTimer)
+    }
     let startTime: number
     const animate = (timestamp: number) => {
       if (!startTime) startTime = timestamp
       const progress = Math.min((timestamp - startTime) / duration, 1)
-      setCount(Math.floor(progress * end))
+      setCount(end * progress)
       if (progress < 1) requestAnimationFrame(animate)
     }
     requestAnimationFrame(animate)
-  }, [isVisible, end, duration])
+  }, [isVisible, end, duration, flickerDone, flickerMs])
 
+  const formatted = decimals > 0 ? Number(count).toFixed(decimals) : String(Math.floor(count))
   return (
-    <span ref={ref} className="stat-number">
-      {prefix}{count}{suffix}
+    <span ref={ref} className={cn("stat-number", className)}>
+      {prefix}{formatted}{suffix}
     </span>
+  )
+}
+
+type PackageKey = 'starter' | 'core' | 'growth' | 'performance'
+
+function PackageDetailsModal({ pkg, onClose }: { pkg: PackageKey, onClose: () => void }) {
+  const content: Record<PackageKey, { title: string; who: string; outcome: string }> = {
+    starter: {
+      title: 'Starter – Compliance Only',
+      who: "Sole traders, micro‑companies, and property investors who just need their annual returns filed correctly.",
+      outcome: "Your year‑end tax and financials are handled, deadlines are met, and you don’t have to think about IRD/ATO letters or payment dates.",
+    },
+    core: {
+      title: 'Core – Compliance + GST',
+      who: "Small GST‑registered businesses with a bit more activity, but no (or very simple) payroll.",
+      outcome: "Your GST, annual accounts, and Companies Office obligations are all taken care of, with regular reports so you always know how the business is tracking.",
+    },
+    growth: {
+      title: 'Growth – Compliance + GST + Payroll',
+      who: "Growing trading businesses with staff who want bookkeeping, GST, and payroll off their plate.",
+      outcome: "Staff are paid correctly and on time, GST is lodged, and you get simple commentary and check‑ins so cash flow and compliance stay under control.",
+    },
+    performance: {
+      title: 'Performance – Advisory Bundle',
+      who: "SMEs that want a proactive partner: regular advice, planning, and numbers to support bigger decisions.",
+      outcome: "A clear budget and forecast, structured quarterly accountability, intentional tax planning, and virtual CFO‑style support so you can grow with confidence instead of reacting at year‑end.",
+    },
+  }
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose()
+    }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [onClose])
+
+  const data = content[pkg]
+  return (
+    <div className="fixed inset-0 z-[60] flex items-center justify-center">
+      <div className="absolute inset-0 bg-black/60" onClick={onClose} />
+      <div className="relative z-10 w-full max-w-2xl mx-auto bg-white p-8 shadow-xl border border-slate-200">
+        <div className="flex items-start justify-between mb-6">
+          <h3 className="text-2xl font-bold text-[#0f172a]">{data.title}</h3>
+          <button onClick={onClose} className="text-slate-500 hover:text-[#0f172a] transition-colors" aria-label="Close">
+            ✕
+          </button>
+        </div>
+        <div className="space-y-6">
+          <div>
+            <div className="text-sm text-[#d4a853] font-semibold mb-2">Who it’s for</div>
+            <p className="text-slate-700 leading-relaxed">{data.who}</p>
+          </div>
+          <div>
+            <div className="text-sm text-[#d4a853] font-semibold mb-2">What outcome you get</div>
+            <p className="text-slate-700 leading-relaxed">{data.outcome}</p>
+          </div>
+        </div>
+        <div className="mt-8 flex items-center justify-end gap-3">
+          <button onClick={onClose} className="px-4 py-2 border border-slate-300 text-[#0f172a] hover:bg-slate-100 transition-colors">Close</button>
+          <Link href="/contact" className="px-4 py-2 bg-[#d4a853] hover:bg-[#e4be6a] text-[#0f172a] font-semibold transition-colors">Get Started</Link>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+type PriceTypeKey = 'individual' | 'sole_trader' | 'company' | 'trust' | 'bookkeeping' | 'payroll' | 'gst' | 'advisory'
+
+function PriceTypeModal({ type, onClose }: { type: PriceTypeKey, onClose: () => void }) {
+  const content: Record<PriceTypeKey, { title: string; subtitle?: string; items: { name: string; price?: string; monthly?: string; yearly?: string }[] }> = {
+    individual: {
+      title: 'Individual income tax',
+      items: [
+        { name: 'Individual income tax return', price: '$150 (Inc GST)' },
+        { name: 'Rental schedule – per property', price: '$75 (Inc GST)' },
+        { name: 'Business schedule (sole trader in ITR, simple, client-prepared)', price: '$99 (Inc GST)' },
+        { name: 'Investment schedule (shares, overseas income, etc.)', price: '$99 (Inc GST)' },
+        { name: 'Crypto schedule', price: '$220 (Inc GST)' },
+        { name: 'Uber / Doordash / DiDi / Delivereasy', price: '$150 (Inc GST)' },
+      ],
+    },
+    sole_trader: {
+      title: 'Sole trader / partnership annual packages (NZD, Ex GST)',
+      items: [
+        { name: 'Up to $75k turnover', monthly: '$30', yearly: '$300' },
+        { name: 'Up to $150k turnover', monthly: '$50', yearly: '$550' },
+        { name: 'Up to $500k turnover', monthly: '$100', yearly: '$1,000' },
+        { name: 'Up to $1m turnover', monthly: '$150', yearly: '$1,500' },
+        { name: 'Up to $2m turnover', monthly: '$200', yearly: '$2,000' },
+        { name: 'Up to $5m turnover', monthly: '$250', yearly: '$2,500' },
+      ],
+    },
+    company: {
+      title: 'Company annual packages (Ex GST)',
+      items: [
+        { name: 'Nil / holding company', yearly: '$150' },
+        { name: 'Up to $150k turnover', monthly: '$100', yearly: '$1,000' },
+        { name: 'Up to $500k turnover', monthly: '$150', yearly: '$1,500' },
+        { name: 'Up to $1m turnover', monthly: '$250', yearly: '$2,500' },
+        { name: 'Up to $2m turnover', monthly: '$500', yearly: '$5,000' },
+        { name: 'Up to $5m turnover', monthly: '$800', yearly: '$8,000' },
+      ],
+    },
+    trust: {
+      title: 'Trust annual packages (Ex GST)',
+      items: [
+        { name: 'Nil / holding trust', yearly: '$150' },
+        { name: 'Up to $150k turnover', monthly: '$100', yearly: '$1,000' },
+        { name: 'Up to $500k turnover', monthly: '$150', yearly: '$1,500' },
+        { name: 'Up to $1m turnover', monthly: '$250', yearly: '$2,500' },
+        { name: 'Up to $2m turnover', monthly: '$500', yearly: '$5,000' },
+        { name: 'Up to $5m turnover', monthly: '$800', yearly: '$8,000' },
+      ],
+    },
+    bookkeeping: {
+      title: 'Bookkeeping packages (Ex GST)',
+      items: [
+        { name: 'Up to $75k turnover — Bi‑monthly processing', monthly: '$100', yearly: '$1,000' },
+        { name: 'Up to $150k turnover — Bi‑monthly processing', monthly: '$150', yearly: '$1,500' },
+        { name: 'Up to $500k turnover — Bi‑monthly processing', monthly: '$300', yearly: '$3,000' },
+        { name: 'Up to $1m turnover — monthly', monthly: '$500', yearly: '$5,000' },
+        { name: 'Up to $2m turnover — monthly', monthly: '$800', yearly: '$8,000' },
+        { name: 'Up to $5m turnover — monthly', monthly: '$1,000', yearly: '$10,000' },
+      ],
+    },
+    payroll: {
+      title: 'Payroll',
+      items: [
+        { name: 'Per employee (includes PAYE filing, KiwiSaver, and usual payroll compliance)', monthly: '$30', yearly: '$300' },
+      ],
+    },
+    gst: {
+      title: 'GST / return‑only work (Ex GST)',
+      items: [
+        { name: 'GST return', price: '$90 per return' },
+        { name: 'Instalment / provisional tax statement', price: '$150 per statement' },
+        { name: 'Annual GST return', price: '$200 per year' },
+      ],
+    },
+    advisory: {
+      title: 'Tax advisory (Ex GST)',
+      items: [
+        { name: 'Structured tax plan', monthly: '$100', yearly: '$1,000' },
+        { name: 'Trust distribution planning', monthly: '$150', yearly: '$1,500' },
+        { name: 'Dividend calculations', monthly: '$150', yearly: '$1,500' },
+        { name: 'FBT return', monthly: '$100', yearly: '$1,000' },
+        { name: 'Accountant’s letter', price: '$200' },
+        { name: 'Financial statement to third party institution', price: '$250' },
+      ],
+    },
+  }
+
+  const data = content[type]
+  return (
+    <div className="fixed inset-0 z-[60] flex items-center justify-center">
+      <div className="absolute inset-0 bg-black/60" onClick={onClose} />
+      <div className="relative z-10 w-full max-w-2xl mx-auto bg-white p-8 shadow-xl border border-slate-200">
+        <div className="flex items-start justify-between mb-6">
+          <h3 className="text-2xl font-bold text-[#0f172a]">{data.title}</h3>
+          <button onClick={onClose} className="text-slate-500 hover:text-[#0f172a] transition-colors" aria-label="Close">✕</button>
+        </div>
+        <div className="space-y-4">
+          {data.subtitle && <p className="text-slate-600">{data.subtitle}</p>}
+          <div className="border border-slate-200">
+            {data.items.some(i => i.monthly || i.yearly) ? (
+              <>
+                <div className="grid grid-cols-[1fr_auto_auto] gap-4 px-4 py-3 bg-slate-50 text-sm font-semibold text-slate-700">
+                  <div>Item</div>
+                  <div className="text-right">Monthly</div>
+                  <div className="text-right">Yearly</div>
+                </div>
+                <div className="divide-y divide-slate-200">
+                  {data.items.map((it, idx) => (
+                    <div key={idx} className="grid grid-cols-[1fr_auto_auto] gap-4 px-4 py-3">
+                      <div className="text-slate-700">{it.name}</div>
+                      <div className="text-[#0f172a] font-medium text-right">{it.monthly ?? '—'}</div>
+                      <div className="text-[#0f172a] font-medium text-right">{it.yearly ?? '—'}</div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="grid grid-cols-[1fr_auto] gap-4 px-4 py-3 bg-slate-50 text-sm font-semibold text-slate-700">
+                  <div>Item</div>
+                  <div className="text-right">Price</div>
+                </div>
+                <div className="divide-y divide-slate-200">
+                  {data.items.map((it, idx) => (
+                    <div key={idx} className="grid grid-cols-[1fr_auto] gap-4 px-4 py-3">
+                      <div className="text-slate-700">{it.name}</div>
+                      <div className="text-[#0f172a] font-medium text-right">{it.price}</div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+        <div className="mt-8 flex items-center justify-end gap-3">
+          <button onClick={onClose} className="px-4 py-2 border border-slate-300 text-[#0f172a] hover:bg-slate-100 transition-colors">Close</button>
+          <Link href="/contact" className="px-4 py-2 bg-[#d4a853] hover:bg-[#e4be6a] text-[#0f172a] font-semibold transition-colors">Talk to Us</Link>
+        </div>
+      </div>
+    </div>
   )
 }
 
@@ -93,6 +317,8 @@ function FloatingShapes() {
 
 export default function HomePage() {
   const [isLoaded, setIsLoaded] = useState(false)
+  const [selectedPackage, setSelectedPackage] = useState<PackageKey | null>(null)
+  const [selectedPriceType, setSelectedPriceType] = useState<PriceTypeKey | null>(null)
 
   useEffect(() => {
     // Set loaded state after mount to trigger entrance animations
@@ -105,16 +331,19 @@ export default function HomePage() {
   return (
     <main className="overflow-x-hidden">
       {/* ============================================
-          HERO SECTION - Dramatic Dark with Mesh Gradient
+          HERO SECTION - Clean White with Green Accents
           ============================================ */}
-      <section className="relative min-h-screen bg-gradient-mesh bg-noise flex items-center">
-        <FloatingShapes />
+      <section
+        className="relative min-h-screen flex items-center bg-cover bg-center"
+        style={{ backgroundImage: "url('/images/office-light.jpg')" }}
+      >
+        <div className="absolute inset-0 bg-white/70" />
 
         <div className="container-xl relative z-10 py-32 lg:py-40">
-          <div className="max-w-5xl">
+          <div className="max-w-5xl mx-auto text-center">
             {/* Eyebrow Badge */}
             <div
-              className={`inline-flex items-center gap-3 mb-8 opacity-0 ${isLoaded ? 'animate-fade-in-up' : ''}`}
+              className={`inline-flex items-center justify-center gap-3 mb-8 opacity-0 ${isLoaded ? 'animate-fade-in-up' : ''}`}
             >
               <span className="text-mono text-[#d4a853] tracking-widest">Accounting as a Service</span>
               <span className="w-12 h-px bg-gradient-to-r from-[#d4a853] to-transparent" />
@@ -122,59 +351,28 @@ export default function HomePage() {
 
             {/* Main Headline */}
             <h1
-              className={`display-hero text-white mb-8 opacity-0 ${isLoaded ? 'animate-fade-in-up delay-100' : ''}`}
+              className={`text-center text-3xl sm:text-4xl lg:text-5xl font-bold text-green-700 mb-8 opacity-0 ${isLoaded ? 'animate-fade-in-up delay-100' : ''}`}
             >
-              Stop stressing over tax deadlines{' '}
-              <span className="block">
-                Your Accounting, Done Right
-              </span>
-              <span className="block text-3xl lg:text-5xl mt-6 text-slate-300 font-normal">
-                On-time compliance in{' '}
-                <span className="gold-text relative font-bold">
-                  On Time
-                  <svg
-                    className="absolute -bottom-2 left-0 w-full h-3"
-                    viewBox="0 0 200 12"
-                    fill="none"
-                    preserveAspectRatio="none"
-                  >
-                    <path
-                      d="M0 9C50 9 50 3 100 3C150 3 150 9 200 9"
-                      stroke="url(#gold-gradient)"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                    />
-                    <defs>
-                      <linearGradient id="gold-gradient" x1="0" y1="0" x2="200" y2="0">
-                        <stop offset="0%" stopColor="#d4a853" />
-                        <stop offset="50%" stopColor="#e4be6a" />
-                        <stop offset="100%" stopColor="#d4a853" />
-                      </linearGradient>
-                    </defs>
-                  </svg>
-                </span>
-                {' '}— guaranteed accuracy
-              </span>
+              Stop stressing over tax deadlines — get your accounting done right.
             </h1>
 
-            {/* Natural tagline */}
+            {/* Statement */}
             <p
-              className={`text-xl text-slate-400 italic max-w-2xl mb-8 opacity-0 ${isLoaded ? 'animate-fade-in-up delay-150' : ''}`}
+              className={`text-center text-lg text-green-700 max-w-2xl mx-auto mb-8 opacity-0 ${isLoaded ? 'animate-fade-in-up delay-150' : ''}`}
             >
-              We handle GST, PAYE/ESCT, payroll, and annual accounts so you can focus on growth.
+              On‑time compliance with guaranteed accuracy.
             </p>
 
             {/* Subheadline */}
             <p
-              className={`text-body-lg text-slate-300 max-w-2xl mb-12 opacity-0 ${isLoaded ? 'animate-fade-in-up delay-200' : ''}`}
+              className={`text-center text-base md:text-lg text-green-600 max-w-2xl mx-auto mb-12 opacity-0 ${isLoaded ? 'animate-fade-in-up delay-200' : ''}`}
             >
-              Fixed-fee packages for sole traders, partnerships, companies, and LTCs.
-              GST, payroll, annual financial statements, and tax returns. From ~$150/month.
+              We handle GST, payroll, and annual accounts so you can focus on growth...
             </p>
 
             {/* CTA Buttons */}
             <div
-              className={`flex flex-col sm:flex-row gap-4 mb-16 opacity-0 ${isLoaded ? 'animate-fade-in-up delay-300' : ''}`}
+              className={`flex flex-col sm:flex-row justify-center gap-4 mb-16 opacity-0 ${isLoaded ? 'animate-fade-in-up delay-300' : ''}`}
             >
               <Link
                 href="/contact"
@@ -187,7 +385,7 @@ export default function HomePage() {
               </Link>
               <Link
                 href="/#packages"
-                className="inline-flex itemsCenter justifyCenter gap-2 border border-slate-600 hover:border-[#d4a853] text-white px-8 py-4 text-lg font-medium rounded-none transition-all duration-300 hover:bg-white/5"
+                className="inline-flex items-center justify-center gap-2 border border-[#006400] text-[#006400] hover:bg-[#006400]/10 px-8 py-4 text-lg font-medium rounded-none transition-all duration-300"
               >
                 See Fixed Fee Packages
               </Link>
@@ -195,21 +393,30 @@ export default function HomePage() {
 
             {/* Social Proof Bar */}
             <div
-              className={`flex flex-wrap items-center gap-8 pt-8 border-t border-slate-800 opacity-0 ${isLoaded ? 'animate-fade-in-up delay-400' : ''}`}
+              className={`flex flex-wrap items-center justify-center gap-8 pt-8 border-t border-slate-200 opacity-0 ${isLoaded ? 'animate-fade-in-up delay-400' : ''}`}
             >
               <div className="flex items-center gap-2">
-                <span className="text-2xl font-bold text-white">99.8%</span>
-                <span className="text-sm text-slate-400">On‑Time Filings</span>
+                <AnimatedCounter end={99.8} decimals={1} suffix="%" flickerMs={500} className="text-2xl font-bold text-green-700" />
+                <span className="text-sm text-green-600">On‑Time Filing</span>
               </div>
-              <div className="w-px h-8 bg-slate-700" />
+              <div className="w-px h-8 bg-slate-200" />
               <div className="flex items-center gap-2">
-                <span className="text-2xl font-bold text-white">500+</span>
-                <span className="text-sm text-slate-400">Returns Filed</span>
+                <AnimatedCounter end={100} suffix="+" flickerMs={500} className="text-2xl font-bold text-green-700" />
+                <span className="text-sm text-green-600">SMEs Supported</span>
               </div>
-              <div className="w-px h-8 bg-slate-700" />
+              <div className="w-px h-8 bg-slate-200" />
               <div className="flex items-center gap-2">
-                <span className="text-2xl font-bold text-white">100+</span>
-                <span className="text-sm text-slate-400">SMEs Supported</span>
+                <AnimatedCounter end={15} suffix="+" flickerMs={500} className="text-2xl font-bold text-green-700" />
+                <span className="text-sm text-green-600">Years of Experience</span>
+              </div>
+              <div className="w-px h-8 bg-slate-200" />
+              <div className="flex items-center gap-2">
+                <AnimatedCounter end={70} suffix="%+" flickerMs={500} className="text-2xl font-bold text-green-700" />
+                <span className="text-sm text-green-600">Clients in Trades, Healthcare, Professional Services</span>
+              </div>
+              <div className="w-px h-8 bg-slate-200" />
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-green-700 font-semibold">Clients Across New Zealand</span>
               </div>
             </div>
           </div>
@@ -288,11 +495,11 @@ export default function HomePage() {
       {/* ============================================
           STATS SECTION - Dark Band
           ============================================ */}
-      <section className="bg-[#0f172a] py-20">
+      <section className="bg-[#006400] py-20">
         <div className="container-lg">
           <div className="text-center max-w-3xl mx-auto">
             <h3 className="display-md text-white mb-4">Choose Clarity. Choose Compliance.</h3>
-            <p className="text-body-lg text-slate-300">Fixed‑fee accounting for SMEs — on‑time GST, payroll, and annual returns.</p>
+            <p className="text-body-lg text-white/80">Fixed‑fee accounting for SMEs — on‑time GST, payroll, and annual returns.</p>
           </div>
         </div>
       </section>
@@ -315,8 +522,8 @@ export default function HomePage() {
           <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {/* Starter */}
             <div className="bg-slate-50 p-8 border border-slate-200 hover:border-[#d4a853]/50 transition-all card-lift">
-              <div className="text-sm text-slate-500 font-semibold mb-2">Starter – Compliance only</div>
-              <div className="text-4xl font-bold text-[#0f172a] mb-2">from ~$150–$220/month</div>
+              <div className="text-sm text-slate-500 font-semibold mb-2">Starter – Compliance Only</div>
+              <div className="text-4xl font-bold text-[#0f172a] mb-2">$150/month</div>
               <div className="text-slate-500 text-sm mb-6">for sole traders, micro companies, simple GST</div>
               <ul className="space-y-3 mb-8 text-sm">
                 <li className="flex items-start gap-2">
@@ -335,13 +542,13 @@ export default function HomePage() {
                   <svg className="w-4 h-4 text-emerald-500 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                   </svg>
-                  <span className="text-slate-600">One annual review meeting</span>
+                  <span className="text-slate-600">One annual review meeting (by video or phone)</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <svg className="w-4 h-4 text-emerald-500 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                   </svg>
-                  <span className="text-slate-600">Basic email support</span>
+                  <span className="text-slate-600">Email support for day‑to‑day questions</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <svg className="w-4 h-4 text-emerald-500 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
@@ -350,9 +557,9 @@ export default function HomePage() {
                   <span className="text-slate-600">Cancel anytime</span>
                 </li>
               </ul>
-               <Link href="/#packages" className="block w-full text-center py-3 border border-slate-300 hover:border-[#0f172a] hover:bg-slate-100 text-[#0f172a] font-medium transition-colors">
+              <button onClick={() => setSelectedPackage('starter')} className="block w-full text-center py-3 border border-slate-300 hover:border-[#0f172a] hover:bg-slate-100 text-[#0f172a] font-medium transition-colors">
                 See details
-              </Link>
+              </button>
             </div>
 
             {/* Professional - MOST POPULAR */}
@@ -361,7 +568,7 @@ export default function HomePage() {
                 MOST POPULAR
               </div>
               <div className="text-sm text-[#d4a853] font-semibold mb-2">Core – Compliance + GST</div>
-              <div className="text-4xl font-bold text-[#0f172a] mb-2">from ~$250–$350/month</div>
+              <div className="text-4xl font-bold text-[#0f172a] mb-2">$250/month</div>
               <div className="text-slate-500 text-sm mb-6">for small GST‑registered businesses</div>
               <ul className="space-y-3 mb-8 text-sm">
                 <li className="flex items-start gap-2">
@@ -374,13 +581,13 @@ export default function HomePage() {
                   <svg className="w-4 h-4 text-emerald-500 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                   </svg>
-                  <span className="text-slate-600">GST return preparation and filing</span>
+                  <span className="text-slate-600">GST return preparation and lodgement</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <svg className="w-4 h-4 text-emerald-500 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                   </svg>
-                  <span className="text-slate-600">Quarterly or bi‑monthly management reports from Xero</span>
+                  <span className="text-slate-600">Quarterly or bi‑monthly management reports</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <svg className="w-4 h-4 text-emerald-500 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
@@ -392,19 +599,19 @@ export default function HomePage() {
                   <svg className="w-4 h-4 text-emerald-500 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                   </svg>
-                  <span className="text-slate-600">Occasional quick queries support by email/phone</span>
+                  <span className="text-slate-600">Priority email support for quick queries</span>
                 </li>
               </ul>
-               <Link href="/#packages" className="block w-full text-center py-3 bg-[#0f172a] hover:bg-[#1e293b] text-white font-semibold transition-colors">
+              <button onClick={() => setSelectedPackage('core')} className="block w-full text-center py-3 bg-[#0f172a] hover:bg-[#1e293b] text-white font-semibold transition-colors">
                 See details
-              </Link>
+              </button>
               <div className="mt-3 text-xs text-center text-slate-500">Most selected by GST‑registered businesses</div>
             </div>
 
             {/* Growth */}
             <div className="bg-slate-50 p-8 border border-slate-200 hover:border-[#d4a853]/50 transition-all card-lift">
               <div className="text-sm text-slate-500 font-semibold mb-2">Growth – Compliance + GST + Payroll</div>
-              <div className="text-4xl font-bold text-[#0f172a] mb-2">from ~$400–$550/month</div>
+              <div className="text-4xl font-bold text-[#0f172a] mb-2">$400/month</div>
               <div className="text-slate-500 text-sm mb-6">for trading companies with a few staff</div>
               <ul className="space-y-3 mb-8 text-sm">
                 <li className="flex items-start gap-2">
@@ -417,7 +624,13 @@ export default function HomePage() {
                   <svg className="w-4 h-4 text-emerald-500 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                   </svg>
-                  <span className="text-slate-600">Payroll processing (e.g. up to 5 employees) and payday filing</span>
+                  <span className="text-slate-600">Payroll processing (e.g. up to 5 employees)</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <svg className="w-4 h-4 text-emerald-500 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  </svg>
+                  <span className="text-slate-600">KiwiSaver and leave accrual management</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <svg className="w-4 h-4 text-emerald-500 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
@@ -431,22 +644,16 @@ export default function HomePage() {
                   </svg>
                   <span className="text-slate-600">Up to 2–4 check‑in meetings per year</span>
                 </li>
-                <li className="flex items-start gap-2">
-                  <svg className="w-4 h-4 text-emerald-500 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
-                  <span className="text-slate-600">Cancel anytime</span>
-                </li>
               </ul>
-               <Link href="/#packages" className="block w-full text-center py-3 border border-slate-300 hover:border-[#0f172a] hover:bg-slate-100 text-[#0f172a] font-medium transition-colors">
+              <button onClick={() => setSelectedPackage('growth')} className="block w-full text-center py-3 border border-slate-300 hover:border-[#0f172a] hover:bg-slate-100 text-[#0f172a] font-medium transition-colors">
                 See details
-              </Link>
+              </button>
             </div>
 
             {/* Performance */}
             <div className="bg-slate-50 p-8 border border-slate-200 hover:border-[#d4a853]/50 transition-all card-lift">
               <div className="text-sm text-slate-500 font-semibold mb-2">Performance – Advisory bundle</div>
-              <div className="text-4xl font-bold text-[#0f172a] mb-2">from ~$650–$900+/month</div>
+              <div className="text-4xl font-bold text-[#0f172a] mb-2">$750/month</div>
               <div className="text-slate-500 text-sm mb-6">for SMEs wanting proactive advice</div>
               <ul className="space-y-3 mb-8 text-sm">
                 <li className="flex items-start gap-2">
@@ -459,13 +666,13 @@ export default function HomePage() {
                   <svg className="w-4 h-4 text-emerald-500 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                   </svg>
-                  <span className="text-slate-600">Annual budget and cash‑flow forecast</span>
+                  <span className="text-slate-600">Annual budget and rolling cash‑flow forecast</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <svg className="w-4 h-4 text-emerald-500 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                   </svg>
-                  <span className="text-slate-600">Quarterly management reports and accountability meetings</span>
+                  <span className="text-slate-600">Monthly management reports and accountability meetings</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <svg className="w-4 h-4 text-emerald-500 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
@@ -477,10 +684,16 @@ export default function HomePage() {
                   <svg className="w-4 h-4 text-emerald-500 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414 0z" clipRule="evenodd" />
                   </svg>
-                  <span className="text-slate-600">Simple strategic/benchmarking review each year</span>
+                  <span className="text-slate-600">Strategic/benchmarking review each year</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <svg className="w-4 h-4 text-emerald-500 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  </svg>
+                  <span className="text-slate-600">Optional virtual CFO support (e.g. board pack prep, KPI tracking) +$150/month</span>
                 </li>
               </ul>
-              <Link href="/#packages" className="block w-full text-center py-3 border border-slate-300 hover:border-[#0f172a] hover:bg-slate-100 text-[#0f172a] font-medium transition-colors">See details</Link>
+              <button onClick={() => setSelectedPackage('performance')} className="block w-full text-center py-3 border border-slate-300 hover:border-[#0f172a] hover:bg-slate-100 text-[#0f172a] font-medium transition-colors">See details</button>
             </div>
           </div>
 
@@ -494,6 +707,25 @@ export default function HomePage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </Link>
+          </div>
+        </div>
+      </section>
+
+      <section id="price-by-type" className="bg-white section-md scroll-mt-16 lg:scroll-mt-20 border-t border-slate-100">
+        <div className="container-lg">
+          <div className="text-center mb-12">
+            <h2 className="display-lg text-[#0f172a] mb-4">Price by Type</h2>
+            <p className="text-body-lg text-slate-600 max-w-2xl mx-auto">Price based on entity type and turnover</p>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-6xl mx-auto">
+            <button onClick={() => setSelectedPriceType('individual')} className="py-4 px-6 border border-slate-300 hover:border-[#d4a853] hover:bg-[#d4a853]/10 text-[#0f172a] font-medium transition-colors">Individual Income Tax</button>
+            <button onClick={() => setSelectedPriceType('sole_trader')} className="py-4 px-6 border border-slate-300 hover:border-[#d4a853] hover:bg-[#d4a853]/10 text-[#0f172a] font-medium transition-colors">Sole Trader / Partnership</button>
+            <button onClick={() => setSelectedPriceType('company')} className="py-4 px-6 border border-slate-300 hover:border-[#d4a853] hover:bg-[#d4a853]/10 text-[#0f172a] font-medium transition-colors">Company</button>
+            <button onClick={() => setSelectedPriceType('trust')} className="py-4 px-6 border border-slate-300 hover:border-[#d4a853] hover:bg-[#d4a853]/10 text-[#0f172a] font-medium transition-colors">Trust</button>
+            <button onClick={() => setSelectedPriceType('bookkeeping')} className="py-4 px-6 border border-slate-300 hover:border-[#d4a853] hover:bg-[#d4a853]/10 text-[#0f172a] font-medium transition-colors">Bookkeeping</button>
+            <button onClick={() => setSelectedPriceType('payroll')} className="py-4 px-6 border border-slate-300 hover:border-[#d4a853] hover:bg-[#d4a853]/10 text-[#0f172a] font-medium transition-colors">Payroll</button>
+            <button onClick={() => setSelectedPriceType('gst')} className="py-4 px-6 border border-slate-300 hover:border-[#d4a853] hover:bg-[#d4a853]/10 text-[#0f172a] font-medium transition-colors">GST / Returns</button>
+            <button onClick={() => setSelectedPriceType('advisory')} className="py-4 px-6 border border-slate-300 hover:border-[#d4a853] hover:bg-[#d4a853]/10 text-[#0f172a] font-medium transition-colors">Tax Advisory</button>
           </div>
         </div>
       </section>
@@ -687,7 +919,7 @@ export default function HomePage() {
           </div>
 
           {/* Quality Details Expandable */}
-          <div className="max-w-4xl mx-auto bg-[#0f172a] p-8 text-white">
+          <div className="max-w-4xl mx-auto bg-[#006400] p-8 text-white">
             <h4 className="text-lg font-semibold mb-6 text-center">
               The 9 Quality Gates Every Proposal Must Pass
             </h4>
@@ -954,7 +1186,7 @@ export default function HomePage() {
           </div>
 
           {/* Premium Intelligence */}
-          <div id="advisory" className="relative bg-gradient-to-br from-[#0f172a] via-[#1e293b] to-[#0f172a] p-12 scroll-mt-16 lg:scroll-mt-20 overflow-hidden">
+          <div id="advisory" className="relative bg-[#006400] p-12 scroll-mt-16 lg:scroll-mt-20 overflow-hidden">
             <div className="absolute top-0 right-0 w-96 h-96 bg-[#d4a853]/10 rounded-full blur-3xl" />
             <div className="relative z-10 max-w-4xl mx-auto">
               <div className="flex flex-col lg:flex-row gap-12 items-center">
@@ -1187,7 +1419,7 @@ export default function HomePage() {
       {/* ============================================
           FINAL CTA
           ============================================ */}
-      <section id="cta" className="relative bg-[#0f172a] section-lg scroll-mt-16 lg:scroll-mt-20 overflow-hidden">
+      <section id="cta" className="relative bg-[#006400] section-lg scroll-mt-16 lg:scroll-mt-20 overflow-hidden">
         {/* Background decoration */}
         <div className="absolute inset-0 bg-gradient-mesh opacity-50" />
         <div
@@ -1267,6 +1499,13 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {selectedPackage && (
+        <PackageDetailsModal pkg={selectedPackage} onClose={() => setSelectedPackage(null)} />
+      )}
+      {selectedPriceType && (
+        <PriceTypeModal type={selectedPriceType} onClose={() => setSelectedPriceType(null)} />
+      )}
     </main>
   )
 }

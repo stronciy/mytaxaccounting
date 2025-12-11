@@ -6,14 +6,14 @@ export function Footer() {
   const currentYear = new Date().getFullYear()
 
   return (
-    <footer className="bg-[#0a0f1a] text-slate-400">
+    <footer className="bg-[#006400] text-white">
       {/* Main Footer */}
       <div className="container-lg">
         <div className="grid grid-cols-1 gap-12 py-16 md:grid-cols-2 lg:grid-cols-5 lg:py-20">
           {/* Brand Column */}
           <div className="lg:col-span-2">
             <Logo variant="light" />
-            <p className="mt-6 text-sm leading-relaxed max-w-sm">
+            <p className="mt-6 text-sm leading-relaxed max-w-sm text-white/80">
               Fixed-fee accounting for SMEs: annual accounts, GST, payroll, and tax returns.
               Accurate compliance and clear reporting—so you can focus on growth.
             </p>
@@ -23,7 +23,7 @@ export function Footer() {
                 href="#"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 flex items-center justify-center border border-slate-700 hover:border-[#d4a853] hover:text-[#d4a853] transition-all duration-300"
+                className="w-10 h-10 flex items-center justify-center border border-white/30 hover:border-white hover:text-white transition-all duration-300"
                 aria-label="LinkedIn"
               >
                 <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
@@ -34,7 +34,7 @@ export function Footer() {
                 href="#"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 flex items-center justify-center border border-slate-700 hover:border-[#d4a853] hover:text-[#d4a853] transition-all duration-300"
+                className="w-10 h-10 flex items-center justify-center border border-white/30 hover:border-white hover:text-white transition-all duration-300"
                 aria-label="X (Twitter)"
               >
                 <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
@@ -47,7 +47,7 @@ export function Footer() {
           {/* Navigation Columns */}
           {Object.values(footerNav).map((section) => (
             <div key={section.title}>
-              <h3 className="text-mono text-[#d4a853] text-xs tracking-widest mb-6">
+              <h3 className="text-mono text-white/80 text-xs tracking-widest mb-6">
                 {section.title}
               </h3>
               <ul className="space-y-4">
@@ -55,7 +55,7 @@ export function Footer() {
                   <li key={link.href}>
                     <Link
                       href={link.href}
-                      className="text-sm text-slate-400 hover:text-white transition-colors"
+                      className="text-sm text-white/80 hover:text-white transition-colors"
                     >
                       {link.label}
                     </Link>
@@ -67,14 +67,14 @@ export function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="border-t border-slate-800 py-6">
+        <div className="border-t border-white/20 py-6">
           <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
-            <p className="text-xs text-slate-600">
+            <p className="text-xs text-white/70">
               &copy; {currentYear} My Tax Accounting. All rights reserved.
             </p>
-            <div className="flex items-center gap-6 text-xs text-slate-600">
+            <div className="flex items-center gap-6 text-xs text-white/70">
               <span className="flex items-center gap-2">
-                <span className="w-2 h-2 bg-emerald-500 rounded-full" />
+                <span className="w-2 h-2 bg-white rounded-full" />
                 All Systems Operational
               </span>
               <span>Globally Available</span>

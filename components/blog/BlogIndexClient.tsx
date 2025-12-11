@@ -3,7 +3,7 @@
 import React from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Section, Container, Badge } from '@/components/ui'
+import { Section, Container, Badge, Button } from '@/components/ui'
 
 type PostItem = {
   id: number
@@ -40,22 +40,22 @@ export function BlogIndexClient() {
   const [error, setError] = React.useState<string | null>(null)
   const [posts, setPosts] = React.useState<PostItem[]>([])
   const [unchanged, setUnchanged] = React.useState(false)
+  const [lastUpdated, setLastUpdated] = React.useState<string>('')
 
-  React.useEffect(() => {
+  const load = React.useCallback(async () => {
     const controller = new AbortController()
     const timer = setTimeout(() => controller.abort(), 8000)
     const url = `/wp-json/wp/v2/posts?per_page=9&page=1&_embed=1`
-    ;(async () => {
-      try {
-        const res = await fetch(url, {
-          cache: 'no-store',
-          headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' },
-          signal: controller.signal,
-        })
-        if (!res.ok) throw new Error(String(res.status))
-        const json = await res.json()
-        if (!Array.isArray(json)) throw new Error('Invalid response')
-        const mapped: PostItem[] = json.map((p: any) => {
+    try {
+      const res = await fetch(url, {
+        cache: 'no-store',
+        headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' },
+        signal: controller.signal,
+      })
+      if (!res.ok) throw new Error(String(res.status))
+      const json = await res.json()
+      if (!Array.isArray(json)) throw new Error('Invalid response')
+      const mapped: PostItem[] = json.map((p: any) => {
           const embed = p._embedded || {}
           const media = embed?.["wp:featuredmedia"]?.[0]
           const featured = media ? {
@@ -77,35 +77,35 @@ export function BlogIndexClient() {
             tags,
           }
         })
-        const serialized = JSON.stringify(mapped)
-        const newHash = hashString(serialized)
-        const prevHash = sessionStorage.getItem('blogPostsHash') || ''
-        if (prevHash && prevHash === newHash) {
-          setUnchanged(true)
-          const cached = sessionStorage.getItem('blogPostsData')
-          if (cached) {
-            try { setPosts(JSON.parse(cached) as PostItem[]) } catch {}
-          } else {
-            setPosts(mapped)
-          }
+      const serialized = JSON.stringify(mapped)
+      const newHash = hashString(serialized)
+      const prevHash = sessionStorage.getItem('blogPostsHash') || ''
+      if (prevHash && prevHash === newHash) {
+        setUnchanged(true)
+        const cached = sessionStorage.getItem('blogPostsData')
+        if (cached) {
+          try { setPosts(JSON.parse(cached) as PostItem[]) } catch {}
         } else {
           setPosts(mapped)
-          sessionStorage.setItem('blogPostsHash', newHash)
-          sessionStorage.setItem('blogPostsData', serialized)
         }
-        setError(null)
-      } catch (e: any) {
-        setError(typeof e?.message === 'string' ? e.message : 'Failed to load')
-      } finally {
-        clearTimeout(timer)
-        setLoading(false)
+      } else {
+        setPosts(mapped)
+        sessionStorage.setItem('blogPostsHash', newHash)
+        sessionStorage.setItem('blogPostsData', serialized)
       }
-    })()
-    return () => {
+      setLastUpdated(new Date().toISOString())
+      setError(null)
+    } catch (e: any) {
+      setError(typeof e?.message === 'string' ? e.message : 'Failed to load')
+    } finally {
       clearTimeout(timer)
-      controller.abort()
+      setLoading(false)
     }
   }, [])
+
+  React.useEffect(() => {
+    load()
+  }, [load])
 
   if (loading) {
     return (
@@ -136,9 +136,19 @@ export function BlogIndexClient() {
   return (
     <Section background="white">
       <Container>
-        {!!unchanged && (
-          <div className="text-xs text-slate-500 mb-3">No new posts since last visit</div>
-        )}
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            {!!unchanged && (
+              <div className="text-xs text-slate-500">No new posts since last visit</div>
+            )}
+            {!!lastUpdated && (
+              <div className="text-xs text-slate-400">Updated at {new Date(lastUpdated).toLocaleTimeString()}</div>
+            )}
+          </div>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={() => { setLoading(true); setUnchanged(false); load() }}>Refresh</Button>
+          </div>
+        </div>
         <div className="grid md:grid-cols-3 gap-8">
           {posts.map((p) => (
             <article key={p.id} className="bg-slate-50 p-6 border border-slate-200 hover:border-[#d4a853]/40 transition-all card-lift">
@@ -166,4 +176,3 @@ export function BlogIndexClient() {
     </Section>
   )
 }
-
