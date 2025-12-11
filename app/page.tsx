@@ -798,7 +798,7 @@ export default function HomePage() {
       {/* ============================================
           FINAL CTA
           ============================================ */}
-      <section id="cta" className="relative bg-[#006400] section-lg scroll-mt-16 lg:scroll-mt-20 overflow-hidden">
+      <section id="cta" className="relative bg-[#006400] section-lg scroll-mt-16 lg:scroll-mt-20">
         {/* Background decoration */}
         <div className="absolute inset-0 bg-gradient-mesh opacity-50" />
         <div
