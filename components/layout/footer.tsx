@@ -70,7 +70,7 @@ export function Footer() {
         <div className="border-t border-white/20 py-6">
           <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
             <p className="text-xs text-white/70">
-              &copy; {currentYear} My Tax Accounting. All rights reserved.
+              &copy; {currentYear} My Tax Accountant Limited. All rights reserved.
             </p>
             <div className="flex items-center gap-6 text-xs text-white/70">
               <span className="flex items-center gap-2">
