@@ -811,12 +811,12 @@ export default function HomePage() {
 
         <div className="container-lg relative z-10">
           <div className="max-w-3xl mx-auto text-center">
-            <span className="text-mono text-[#d4a853] text-sm mb-6 block">Stop Missing Deadlines. Start Operating Clean.</span>
+            <span className="text-mono text-[#d4a853] text-sm mb-6 block">Stop Missing Deadlines. <br />Start Operating Clean.</span>
             <h2 className="display-xl text-white mb-6">
-              Every Day You Wait Is Another<br />
-              <span className="gold-text">Risk of IRD Penalties</span>
+              Stop Missing Tax Deadlines. <br />Start Running Clean.
+              <span className="gold-text"><br />Behind With IRD? <br />Every Day Adds Cost.</span>
             </h2>
-            <p className="text-body-lg text-slate-300 mb-10 max-w-2xl mx-auto">Join SMEs who chose on‑time compliance, clear reports, and fixed monthly fees.</p>
+            <p className="text-body-lg text-slate-300 mb-10 max-w-2xl mx-auto">End the IRD Stress – Get Your Filings Back on Track.</p>
 
             {/* What Happens Next */}
             <div className="bg-white/5 border border-slate-700 p-8 mb-10 text-left max-w-xl mx-auto">
