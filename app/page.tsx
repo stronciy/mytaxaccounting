@@ -811,10 +811,10 @@ export default function HomePage() {
 
         <div className="container-lg relative z-10">
           <div className="max-w-3xl mx-auto text-center">
-            <span className="text-mono text-[#d4a853] text-sm mb-6 block">Stop Missing Deadlines. <br />Start Operating Clean.</span>
+            <span className="text-mono text-[#d4a853] text-sm mb-6 block">Stop Missing Tax Deadlines. Start Running Clean.</span>
             <h2 className="display-xl text-white mb-6">
-              Stop Missing Tax Deadlines. <br />Start Running Clean.
-              <span className="gold-text"><br />Behind With IRD? <br />Every Day Adds Cost.</span>
+              Behind With IRD? Every Day Adds Cost.<br />
+              <span className="gold-text">Risk of IRD Penalties</span>
             </h2>
             <p className="text-body-lg text-slate-300 mb-10 max-w-2xl mx-auto">End the IRD Stress – Get Your Filings Back on Track.</p>
 
