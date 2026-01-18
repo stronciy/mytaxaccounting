@@ -420,10 +420,7 @@ export default function HomePage() {
         </div>
 
         {/* Scroll indicator */}
-        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-60">
-          <span className="text-xs text-slate-400 uppercase tracking-widest">Scroll</span>
-          <div className="w-px h-12 bg-gradient-to-b from-slate-400 to-transparent" />
-        </div>
+
       </section>
 
       {/* ============================================
@@ -436,7 +433,7 @@ export default function HomePage() {
         <div className="container-lg relative z-10">
           <div className="text-center mb-12">
             <h2 className="display-lg text-[#0f172a] mb-4">
-             Why Choose My Tax Accountant?
+              Why Choose My Tax Accountant?
             </h2>
             <p className="text-body-lg text-slate-600 max-w-2xl mx-auto">
               Accurate compliance, proactive reminders, and clear financials—without surprises.
@@ -562,13 +559,13 @@ export default function HomePage() {
               <span className="inline-block px-3 py-1 bg-[#d4a853] text-[#0f172a] text-xs font-semibold mb-4">ADVISORY UPGRADE</span>
               <h2 className="display-lg text-white mb-4">Performance – Advisory bundle</h2>
               <p className="text-white/80 mb-8 max-w-2xl">
-                For SMEs wanting proactive advice, add annual budgeting, cash‑flow forecasting, quarterly reports and accountability meetings, and tax planning before year‑end.
+                For SMEs wanting proactive advice, add annual budgeting, cash‑flow forecasting, monthly reports and accountability meetings, and tax planning before year‑end.
               </p>
               <div className="border border-[#1c7a35] bg-[#115320] text-white p-6 mb-6">
                 <div className="flex flex-wrap items-center gap-6">
                   <span className="font-semibold">What You Get:</span>
                   <span className="text-white/90">Budget &amp; Forecast</span>
-                  <span className="text-white/60">Quarterly reports</span>
+                  <span className="text-white/60">Monthly reports</span>
                   <span className="text-[#d4a853] font-semibold">Tax planning</span>
                 </div>
               </div>
@@ -585,15 +582,15 @@ export default function HomePage() {
                   <svg className="w-5 h-5 text-emerald-300 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
                   <span>Monthly strategy and accountability meetings</span>
                 </li>
-                 <li className="flex items-start gap-2">
+                <li className="flex items-start gap-2">
                   <svg className="w-5 h-5 text-emerald-300 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
                   <span>Rolling 12‑month cash‑flow forecasting and scenario modelling</span>
                 </li>
-                 <li className="flex items-start gap-2">
+                <li className="flex items-start gap-2">
                   <svg className="w-5 h-5 text-emerald-300 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
                   <span>Mid‑year and pre‑year‑end tax planning and estimate of tax payable</span>
                 </li>
-                 <li className="flex items-start gap-2">
+                <li className="flex items-start gap-2">
                   <svg className="w-5 h-5 text-emerald-300 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
                   <span>Support with pricing, margins and break‑even analysis for growth decisions</span>
                 </li>
@@ -607,7 +604,7 @@ export default function HomePage() {
               <div className="bg-white p-8 border border-slate-200 shadow-sm">
                 <div className="text-center">
                   <div className="text-sm text-slate-600 mb-2">Upgrade any package</div>
-                  <div className="text-2xl font-bold text-[#0f172a] mb-2">from ~$650–$900+/month</div>
+                  <div className="text-2xl font-bold text-[#0f172a] mb-2">from ~$100–$900+/month</div>
                   <div className="text-xs text-slate-500 mb-6">depending on scope</div>
                   <Link href="/contact" className="inline-flex items-center justify-center px-6 py-3 bg-[#d4a853] text-[#0f172a] font-semibold hover:bg-[#e4be6a] transition-colors">
                     Request Advisory Bundle
@@ -619,7 +616,7 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-      
+
       {/* ============================================
           HOW IT WORKS - Timeline Style
           ============================================ */}
@@ -641,31 +638,31 @@ export default function HomePage() {
 
             <div className="grid lg:grid-cols-3 gap-12">
               {[
-              {
-                step: '01',
-                title: 'Onboarding & Setup',
-                description: 'We set up GST/PAYE, connect Xero/MYOB, and align your chart of accounts.',
-                icon: (
+                {
+                  step: '01',
+                  title: 'Onboarding & Setup',
+                  description: 'We set up GST/PAYE, connect Xero/MYOB, and align your chart of accounts.',
+                  icon: (
                     <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                     </svg>
                   ),
                 },
-              {
-                step: '02',
-                title: 'Bookkeeping & GST',
-                description: 'Monthly bookkeeping, GST preparation and filing, proactive reminders.',
-                icon: (
+                {
+                  step: '02',
+                  title: 'Bookkeeping & GST',
+                  description: 'Monthly bookkeeping, GST preparation and filing, proactive reminders.',
+                  icon: (
                     <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                     </svg>
                   ),
                 },
-              {
-                step: '03',
-                title: 'Payroll & Annual Accounts',
-                description: 'Payroll processing and payday filing; year‑end financial statements and tax returns.',
-                icon: (
+                {
+                  step: '03',
+                  title: 'Payroll & Annual Accounts',
+                  description: 'Payroll processing and payday filing; year‑end financial statements and tax returns.',
+                  icon: (
                     <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
                     </svg>
@@ -695,9 +692,9 @@ export default function HomePage() {
       <section className="bg-slate-50 section-lg">
         <div className="container-lg">
           <div className="text-center mb-16">
-              <span className="text-mono text-[#d4a853] text-sm mb-4 block">Capabilities</span>
-              <h2 className="display-lg text-[#0f172a] mb-4">Tools We Work With</h2>
-              <p className="text-body-lg text-slate-600 max-w-2xl mx-auto">Modern software and robust processes for reliable accounting</p>
+            <span className="text-mono text-[#d4a853] text-sm mb-4 block">Capabilities</span>
+            <h2 className="display-lg text-[#0f172a] mb-4">Tools We Work With</h2>
+            <p className="text-body-lg text-slate-600 max-w-2xl mx-auto">Modern software and robust processes for reliable accounting</p>
           </div>
 
           <div className="space-y-10">
@@ -859,7 +856,7 @@ export default function HomePage() {
                 href="/#price-by-type"
                 className="inline-flex items-center justify-center gap-2 border border-slate-600 hover:border-white text-white px-10 py-5 text-lg font-medium transition-all duration-300"
               >
-                 See Price List
+                See Price List
               </Link>
             </div>
 

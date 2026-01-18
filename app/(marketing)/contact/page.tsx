@@ -13,7 +13,7 @@ export default function ContactPage() {
         <Container>
           <div className='max-w-3xl mx-auto text-center'>
             <h1 className='text-4xl md:text-5xl font-bold text-gray-900 mb-6'>Let&apos;s Talk Accounting</h1>
-            <p className='text-xl text-gray-600'>We typically respond within 4 hours during business hours.</p>
+            <p className='text-xl text-gray-600'>We endeavor to respond with 1 business day.</p>
           </div>
         </Container>
       </Section>
@@ -43,9 +43,9 @@ export default function ContactPage() {
                 <Button variant='default' className='w-full'>Send Message</Button>
               </form>
             </Card>
-            
+
             <div className='space-y-8'>
-              <div>
+              {/* <div>
                 <h3 className='text-xl font-semibold mb-4'>Contact Information</h3>
                 <div className='space-y-3 text-gray-600'>
                   <p>Phone: +64 27 242 3432</p>
@@ -69,7 +69,7 @@ export default function ContactPage() {
                   <p>Company Status: Registered</p>
                   <p>Entity type: NZ Limited Company</p>
                 </div>
-              </div>
+              </div> */}
 
               <div>
                 <h3 className='text-xl font-semibold mb-4'>Industry Classification(s)</h3>
@@ -77,13 +77,13 @@ export default function ContactPage() {
                   <p>M693250 Tax agent</p>
                 </div>
               </div>
-              
+
               <div>
                 <h3 className='text-xl font-semibold mb-4'>Book a Free Consultation</h3>
                 <p className='text-gray-600 mb-4'>Schedule a 30-minute call to discuss your accounting needs.</p>
                 <Button variant='outline'>Schedule a Call</Button>
               </div>
-              
+
 
             </div>
           </div>
